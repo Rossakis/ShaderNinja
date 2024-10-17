@@ -29,9 +29,11 @@ set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
 set(GLFW_INSTALL OFF CACHE BOOL "" FORCE)
 set(BUILD_SHARED_LIBS OFF CACHE BOOL "" FORCE)
 
-add_subdirectory(third-party/glfw)			#window oppener
-add_subdirectory(third-party/glad)				#opengl loaderh
-add_subdirectory(third-party/imgui)		#ui
+add_subdirectory(third-party/glfw)
+add_subdirectory(third-party/glad)
+add_subdirectory(third-party/imgui)
+add_subdirectory(third-party/stb_image)
+add_subdirectory(third-party/glm)
 
 
 # MY_SOURCES is defined to be a list of all the source files for my game
@@ -77,4 +79,4 @@ endif()
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
 
 #enet not working yet on linux for some reason
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui glm stb_image)
