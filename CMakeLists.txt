@@ -2,14 +2,6 @@ cmake_minimum_required(VERSION 3.30)
 
 set(CMAKE_CXX_STANDARD 20)
 
-#! ! ! ! ! ! !
-#set this to true to ship the game!
-#basically this will change the RESOURCES_PATH to be the local path
-#! ! ! ! ! ! !
-#DELETE THE OUT FOLDER AFTER CHANGING THIS BECAUSE VISUAL STUDIO DOESN'T SEEM TO RECOGNIZE THIS CHANGE AND REBUILD!
-option(PRODUCTION_BUILD "Make this a production build" OFF)
-#DELETE THE OUT FOLDER AFTER CHANGING THIS BECAUSE VISUAL STUDIO DOESN'T SEEM TO RECOGNIZE THIS CHANGE AND REBUILD!
-
 include(CheckIPOSupported)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
@@ -35,45 +27,23 @@ add_subdirectory(third-party/imgui)
 add_subdirectory(third-party/stb_image)
 add_subdirectory(third-party/glm)
 
-
-# MY_SOURCES is defined to be a list of all the source files for my game
-# DON'T ADD THE SOURCES BY HAND, they are already added with this macro
-file(GLOB_RECURSE MY_SOURCES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
-
+# SOURCE_FILES is defined to be a list of all the source files for the game
+# So no need to add the source files by hand, since they are already added with this macro
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable("${CMAKE_PROJECT_NAME}")
-
 set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 17)
-
-
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC GLFW_INCLUDE_NONE=1)
 
-if(PRODUCTION_BUILD)
-    # setup the ASSETS_PATH macro to be in the root folder of your exe
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="./resources/")
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0)
 
-    # remove the option to debug asserts.
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=1)
-
-else()
-    # This is useful to get an ASSETS_PATH in your IDE during development
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
-    target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0)
-
-endif()
-
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${MY_SOURCES} )
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${SOURCE_FILES} )
 
 
 if(MSVC) # If using the VS compiler...
-
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
-
     set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") #no console
-
-    #set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreadedDebug<$<CONFIG:Debug>:Debug>")
-    #set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
-
 endif()
 
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
