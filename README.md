@@ -10,7 +10,7 @@ In case you're using "<b>Visual Studio Code</b>", make sure to download the "<b>
 
 ### Step 1: Navigate to the directory through your terminal
 ```
-cd <custom-ShaderNinja-directory> 
+cd "your-ShaderNinja-directory" 
 ```
 For example,
 ```
@@ -19,15 +19,15 @@ cd C:\Users\MyName\Documents\ShaderNinja
 
 ### Step 2: Specify CMake source and buildsystem files
 ```
-cmake -S <./src> -B <./build>
+cmake -B ./build
 ```
 
-This will create your project's "build" directory, with the necessary CMake buildsystem files.
+This will create your project's "build" directory within the current one, along with the necessary CMake buildsystem files.
 <br/>
 <br/>
 ### Step 3: Create the CMake build files
 ```
-cmake --build <./build>
+cmake --build ./build
 ```
 This will create the build files using the compiler available on your operating system (E.g., Ninja, Clang, GNU, etc.).
 <br/>
