@@ -16,6 +16,7 @@ For example,
 ```
 cd C:\Users\MyName\Documents\ShaderNinja
 ```
+<br/>
 
 ### Step 2: Specify CMake source and buildsystem files
 ```
