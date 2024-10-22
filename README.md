@@ -3,10 +3,8 @@
 ### NOTE: Make sure you have at least C++ 20, and have installed CMake on your device beforehand at: 
 https://cmake.org/download/
 <br/>
-<br/>
 
-NOTE* In case you're using "<b>Visual Studio Code</b>", make sure to download the "<b>C/C++
-</b>" and "<b>CMake Tools</b>" extensions by Microsoft.
+In case you're using "<b>Visual Studio Code</b>", make sure to download the "<b>C/C++</b>" and "<b>CMake Tools</b>" extensions by Microsoft.
 <br/>
 <br/>
 
