@@ -5,6 +5,11 @@ https://cmake.org/download/
 <br/>
 <br/>
 
+NOTE* In case you're using "<b>Visual Studio Code</b>", make sure to download the "<b>C/C++
+</b>" and "<b>CMake Tools</b>" extensions by Microsoft.
+<br/>
+<br/>
+
 ### Step 1: Navigate to the directory through your terminal
 ```
 cd <custom-ShaderNinja-directory> 
