@@ -6,14 +6,18 @@
 #include <stdexcept>
 #include <cstdlib>
 
-#define numVAOs 1 //number of vertices
+#define numVAOs 1 // VAO = Vertex Array Objects 
 
 GLuint renderingProgram;
-GLuint vao[numVAOs];
+GLuint vao[numVAOs]; 
+
 
 GLuint createShaderProgram() {
 
-    //Define the shaders
+    //STEPS FOR CREATING SHADERS IN OPENGL
+    // -------------------------
+
+    // 1) Write Shader Code 
     const GLchar* vertShaderSource =
         "#version 430 core \n"
         "void main(void) \n"
@@ -21,43 +25,44 @@ GLuint createShaderProgram() {
 
     const GLchar* fragShaderSource =
         "#version 430 core \n"
+        "out vec4 color; \n"
         "void main(void) \n"
-        "{color = vec4(0.0, 0.0, 1.0, 1.0); }";
+        "{ if (gl_FragCoord.x < 635) color = vec4(1.0, 0.0, 0.0, 1.0); else color = vec4(0.0, 0.0, 1.0, 1.0); }";
 
-    //Create shader instances
+    // 2) Create Shader Objects
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
     GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
 
-    //Define the shader sources
+    // 3) Load and Attach Shader Source Code
     glShaderSource(vertexShader, 1, &vertShaderSource, NULL);
     glShaderSource(fragShader, 1, &fragShaderSource, NULL);
 
-    //Compile the shaders
+    // 4) Compile the shaders
     glCompileShader(vertexShader);
     glCompileShader(fragShader);
 
-    //Init the program
+    // 5) Create the ShaderProgram
     GLuint program = glCreateProgram();
 
-    //Attach shaders to it
+    // 6) Attach Shaders abd Link the Shader Program
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragShader);
-
-    //Link the program and return it
-    glLinkProgram(program);
+    glLinkProgram(program);//request to the GLSL compiler to ensure that the shaders are compatible  
+    
     return program;
 }
 
 //Initializes the OpenGL pipeline (vertex shader, fragment shader, etc...)
 void init(GLFWwindow* window) {
     renderingProgram = createShaderProgram();
+    glPointSize(40.0f);
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
 }
 
 void display(GLFWwindow* window, double currentTime) {
-    glUseProgram(renderingProgram);
-    glDrawArrays(GL_POINTS, 0, 1);
+    glUseProgram(renderingProgram);//load the program with our shaders to the GPU
+    glDrawArrays(GL_POINTS, 0, 1); //initiate pipeline processing
 
     //glClearColor(0.0, 0.0, 0.0, 1.0);// Set clear color to black
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear both the color and depth buffer
@@ -103,7 +108,7 @@ int main() {
 
     glfwMakeContextCurrent(window);
 
-    //Init Glad and Load OpenGL functions through it
+    //Init Glad and load OpenGL functions through it
     if (!gladLoadGLLoader((GLADloadproc)glfwGetProcAddress)) {
         throw std::runtime_error("Failed to load OpenGL context\n");
     }
