@@ -29,9 +29,7 @@ add_subdirectory(dependencies/glm)
 
 # SOURCE_FILES is defined to be a list of all the source files for the game
 # So no need to add the source files by hand, since they are already added with this macro
-file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS 
-                            "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp"
-                            "${CMAKE_CURRENT_SOURCE_DIR}/include/*.h")
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable("${CMAKE_PROJECT_NAME}")
 

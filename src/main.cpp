@@ -1,68 +1,62 @@
-#include <glad/glad.h>
+#include <glad/glad.h>//should always be included before glfw
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
+#include <cmath>
 
-#include <shaderStream.h>
+#include <Utils.h>
 
 #define numVAOs 1 // VAO = Vertex Array Objects 
 
 GLuint renderingProgram;
 GLuint vao[numVAOs]; 
-
-
-GLuint createShaderProgram() {
-
-    //STEPS FOR CREATING SHADERS IN OPENGL
-    // -------------------------
-
-    // 1) Write Shader Code and reference it
-    const std::string vertString = ShaderStream::readShaderFile("../resources/vertexShader.glsl");
-    const std::string fragString = ShaderStream::readShaderFile("../resources/fragmentShader.glsl");
-
-    const GLchar* vertShaderSource = vertString.c_str();
-    const GLchar* fragShaderSource = fragString.c_str();
-
-    // 2) Create Shader Objects
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // 3) Load and Attach Shader Source Code
-    glShaderSource(vertexShader, 1, &vertShaderSource, NULL);
-    glShaderSource(fragShader, 1, &fragShaderSource, NULL);
-
-    // 4) Compile the shaders
-    glCompileShader(vertexShader);
-    glCompileShader(fragShader);
-
-    // 5) Create the ShaderProgram
-    GLuint program = glCreateProgram();
-
-    // 6) Attach Shaders abd Link the Shader Program
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragShader);
-    glLinkProgram(program);//request to the GLSL compiler to ensure that the shaders are compatible  
-    
-    return program;
-}
+float lastTime = 0.0f;
+float deltaTime = 0.0f;
 
 //Initializes the OpenGL pipeline (vertex shader, fragment shader, etc...)
 void init(GLFWwindow* window) {
-    renderingProgram = createShaderProgram();
+    renderingProgram = Utils::createShaderProgram("../resources/vertexShader.glsl", "../resources/fragmentShader.glsl");
     glPointSize(30.0f);
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
 }
 
-void display(GLFWwindow* window, double currentTime) {
-    glUseProgram(renderingProgram);//load the program with our shaders to the GPU
-    glDrawArrays(GL_TRIANGLES, 0, 3); //initiate pipeline processing
+float posX = 0.0f;
+float inc = 0.5f;
+void moveTriangle(float *x, float *increment){
+    *x += *increment * deltaTime;
 
-    //glClearColor(0.0, 0.0, 0.0, 1.0);// Set clear color to black
-    //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear both the color and depth buffer
+    if(*x > 1.0f)
+        *increment = -(*increment);//move to left
+    if(*x < -1.0f)
+        *increment = abs(*increment);//move to right
+
+    GLuint offsetLoc = glGetUniformLocation(renderingProgram, "offset");
+    glProgramUniform1f(renderingProgram, offsetLoc, posX);
+}
+
+
+void display(GLFWwindow* window, double currentTime) {
+    //Clear buffers for HSR
+    glClear(GL_DEPTH_BUFFER_BIT);
+    glClearColor(0.0, 0.0, 0.0, 1.0);
+    glClear(GL_COLOR_BUFFER_BIT);
+
+    //Load the program with our shaders to the GPU
+    glUseProgram(renderingProgram);
+
+    moveTriangle(&posX, &inc);
+
+    //Change the vertex shader's x-position field
+    GLuint offsetLoc = glGetUniformLocation(renderingProgram, "offset");
+    glProgramUniform1f(renderingProgram, offsetLoc, posX);
+
+    //Initiate pipeline processing
+    glDrawArrays(GL_TRIANGLES, 0, 3); 
+
     //when depth buffer is cleared, it goes to 1 (farthest from the camera)
 }
 
@@ -86,7 +80,6 @@ GLFWwindow* setScreenMode(bool isFullScreen) {
 }
 
 int main() {
-
     //Initialize the GLFW library
     if (!glfwInit()) {
         exit(EXIT_FAILURE);
@@ -114,11 +107,14 @@ int main() {
     glfwSwapInterval(1);// 1 = number of screen updates before the GLFW buffers get swapped
 
     init(window);
-
+    
     // std::cout << ShaderStream::shaderToString("fragmentShader.glsl") << std::endl;
+    lastTime = glfwGetTime();
 
     //Wait until user closes the window
     while (!glfwWindowShouldClose(window)) {
+        deltaTime = glfwGetTime() - lastTime;
+        lastTime = glfwGetTime();
         display(window, glfwGetTime());
         processInput(window);//if we processInput after glfwPollEvents, then input will be delayed until the next frame
 
