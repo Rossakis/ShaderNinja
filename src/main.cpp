@@ -6,6 +6,8 @@
 #include <stdexcept>
 #include <cstdlib>
 
+#include <shaderStream.h>
+
 #define numVAOs 1 // VAO = Vertex Array Objects 
 
 GLuint renderingProgram;
@@ -17,17 +19,12 @@ GLuint createShaderProgram() {
     //STEPS FOR CREATING SHADERS IN OPENGL
     // -------------------------
 
-    // 1) Write Shader Code 
-    const GLchar* vertShaderSource =
-        "#version 430 core \n"
-        "void main(void) \n"
-        "{gl_Position = vec4(0.0, 0.0, 0.0, 1.0); }";
+    // 1) Write Shader Code and reference it
+    const std::string vertString = ShaderStream::readShaderFile("../resources/vertexShader.glsl");
+    const std::string fragString = ShaderStream::readShaderFile("../resources/fragmentShader.glsl");
 
-    const GLchar* fragShaderSource =
-        "#version 430 core \n"
-        "out vec4 color; \n"
-        "void main(void) \n"
-        "{ if (gl_FragCoord.x < 635) color = vec4(1.0, 0.0, 0.0, 1.0); else color = vec4(0.0, 0.0, 1.0, 1.0); }";
+    const GLchar* vertShaderSource = vertString.c_str();
+    const GLchar* fragShaderSource = fragString.c_str();
 
     // 2) Create Shader Objects
     GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
@@ -55,14 +52,14 @@ GLuint createShaderProgram() {
 //Initializes the OpenGL pipeline (vertex shader, fragment shader, etc...)
 void init(GLFWwindow* window) {
     renderingProgram = createShaderProgram();
-    glPointSize(40.0f);
+    glPointSize(30.0f);
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
 }
 
 void display(GLFWwindow* window, double currentTime) {
     glUseProgram(renderingProgram);//load the program with our shaders to the GPU
-    glDrawArrays(GL_POINTS, 0, 1); //initiate pipeline processing
+    glDrawArrays(GL_TRIANGLES, 0, 3); //initiate pipeline processing
 
     //glClearColor(0.0, 0.0, 0.0, 1.0);// Set clear color to black
     //glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT); //clear both the color and depth buffer
@@ -117,6 +114,8 @@ int main() {
     glfwSwapInterval(1);// 1 = number of screen updates before the GLFW buffers get swapped
 
     init(window);
+
+    // std::cout << ShaderStream::shaderToString("fragmentShader.glsl") << std::endl;
 
     //Wait until user closes the window
     while (!glfwWindowShouldClose(window)) {
