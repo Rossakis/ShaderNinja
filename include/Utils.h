@@ -2,6 +2,7 @@
 #include <string>
 #include <iostream>
 #include <glad/glad.h>
+#include <glfw/glfw3.h>
 
 /// @brief A helper class that contains useful utility methods, such as reading shader files
 class Utils {
@@ -13,5 +14,5 @@ class Utils {
         //Debug
         static const void printShaderLog(GLuint shader);
         static const void printProgramLog(int program);
-        static const bool checkOpenGLError();
+        static const GLenum checkOpenGLError(const char *file, int line);
 };

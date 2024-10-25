@@ -21,9 +21,6 @@ const std::string Utils::readShaderFile(const char* shaderFileName){
     };
 
 const GLuint Utils::createShaderProgram(const char* vertFile, const char* fragFile){
-    //STEPS FOR CREATING SHADERS IN OPENGL
-    // -------------------------
-
     // 1) Write Shader Code and reference it
     const std::string vertString = Utils::readShaderFile(vertFile);
     const std::string fragString = Utils::readShaderFile(fragFile);
@@ -42,6 +39,10 @@ const GLuint Utils::createShaderProgram(const char* vertFile, const char* fragFi
     // 4) Compile the shaders
     glCompileShader(vertexShader);
     glCompileShader(fragShader);
+
+    //IMPORTANT: Check for any shader errors
+    Utils::printShaderLog(vertexShader);
+    Utils::printShaderLog(fragShader);
 
     // 5) Create the ShaderProgram
     GLuint program = glCreateProgram();
@@ -84,15 +85,26 @@ const void Utils::printProgramLog(int program){
     }
 }
 
-const bool Utils::checkOpenGLError(){
-    bool foundError = false;
-    int glError = glGetError();
-
-    while(glError != GL_NO_ERROR){
-        std::cout << "glError: " << glError << std::endl;
-        foundError = true;
-        glError = glGetError();
+const GLenum Utils::checkOpenGLError(const char *file, int line)
+{
+    GLenum errorCode;
+    if ((errorCode = glGetError()) != GL_NO_ERROR)
+    {
+        std::string error;
+        switch (errorCode)
+        {
+            case GL_INVALID_ENUM:                  error = "INVALID_ENUM"; break;
+            case GL_INVALID_VALUE:                 error = "INVALID_VALUE"; break;
+            case GL_INVALID_OPERATION:             error = "INVALID_OPERATION"; break;
+            case GL_STACK_OVERFLOW:                error = "STACK_OVERFLOW"; break;
+            case GL_STACK_UNDERFLOW:               error = "STACK_UNDERFLOW"; break;
+            case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
+            case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
+        }
+        std::cout << error << " | " << file << " (" << line - 1 << ")" << std::endl;
+        glfwTerminate();
+        exit(EXIT_SUCCESS);
     }
-
-    return foundError;
+    return errorCode;
 }
+#define glCheckError() glCheckError_(__FILE__, __LINE__)

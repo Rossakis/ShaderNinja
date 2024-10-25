@@ -1,41 +1,85 @@
+//Dependencies
 #include <glad/glad.h>//should always be included before glfw
 #include <GLFW/glfw3.h>
 #include <imgui.h>
 
+//Standard libraries
 #include <iostream>
 #include <stdexcept>
 #include <cstdlib>
 #include <cmath>
 
+//Include headers
 #include <Utils.h>
+#include <TimeManager.h>
 
 #define numVAOs 1 // VAO = Vertex Array Objects 
 
 GLuint renderingProgram;
 GLuint vao[numVAOs]; 
-float lastTime = 0.0f;
-float deltaTime = 0.0f;
 
 //Initializes the OpenGL pipeline (vertex shader, fragment shader, etc...)
 void init(GLFWwindow* window) {
     renderingProgram = Utils::createShaderProgram("../resources/vertexShader.glsl", "../resources/fragmentShader.glsl");
-    glPointSize(30.0f);
+    glPointSize(5.0f);
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
 }
 
 float posX = 0.0f;
 float inc = 0.5f;
-void moveTriangle(float *x, float *increment){
-    *x += *increment * deltaTime;
+float currentInc = inc;
+void moveTriangle(){
+    posX += currentInc * TimeManager::instance().getDeltaTime();
+    if(posX > 1.0f)
+        currentInc = -inc;//move to left
+    if(posX < -1.0f)
+        currentInc = inc;//move to right
 
-    if(*x > 1.0f)
-        *increment = -(*increment);//move to left
-    if(*x < -1.0f)
-        *increment = abs(*increment);//move to right
-
+    //Change the vertex shader's x-position field
     GLuint offsetLoc = glGetUniformLocation(renderingProgram, "offset");
     glProgramUniform1f(renderingProgram, offsetLoc, posX);
+}
+
+//Size params
+float maxSize = 2.5f;
+float minSize = 0.25f;
+float currentSize = minSize;
+bool isDecreasing = false;
+void scalePoints()
+{
+    if(!isDecreasing)
+    {
+        isDecreasing = currentSize >= maxSize ? true : false;
+        currentSize += 20.0f * TimeManager::instance().getDeltaTime();
+    }
+
+    if(isDecreasing)
+    {
+        currentSize -= 20.0f * TimeManager::instance().getDeltaTime();
+        isDecreasing = currentSize <= minSize ? false : true;
+    }
+
+    glPointSize(currentSize);
+}
+
+void scaleTriangle()
+{
+    if(!isDecreasing)
+    {
+        isDecreasing = currentSize >= maxSize ? true : false;
+        currentSize += 0.5f * TimeManager::instance().getDeltaTime();
+    }
+
+    if(isDecreasing)
+    {
+        isDecreasing = currentSize <= minSize ? false : true;
+        currentSize -= 0.5f * TimeManager::instance().getDeltaTime();     
+    }
+
+    //Change the vertex shader's x-position field
+    GLuint scaleLoc = glGetUniformLocation(renderingProgram, "scale");
+    glProgramUniform1f(renderingProgram, scaleLoc, currentSize);
 }
 
 
@@ -48,14 +92,12 @@ void display(GLFWwindow* window, double currentTime) {
     //Load the program with our shaders to the GPU
     glUseProgram(renderingProgram);
 
-    moveTriangle(&posX, &inc);
-
-    //Change the vertex shader's x-position field
-    GLuint offsetLoc = glGetUniformLocation(renderingProgram, "offset");
-    glProgramUniform1f(renderingProgram, offsetLoc, posX);
-
+    moveTriangle();
+    scaleTriangle();
+    
     //Initiate pipeline processing
     glDrawArrays(GL_TRIANGLES, 0, 3); 
+    Utils::checkOpenGLError(__FILE__, __LINE__);
 
     //when depth buffer is cleared, it goes to 1 (farthest from the camera)
 }
@@ -107,14 +149,11 @@ int main() {
     glfwSwapInterval(1);// 1 = number of screen updates before the GLFW buffers get swapped
 
     init(window);
-    
-    // std::cout << ShaderStream::shaderToString("fragmentShader.glsl") << std::endl;
-    lastTime = glfwGetTime();
-
     //Wait until user closes the window
     while (!glfwWindowShouldClose(window)) {
-        deltaTime = glfwGetTime() - lastTime;
-        lastTime = glfwGetTime();
+        //TODO: create a wrapper class that updates all the Manager type classes (TimeManager, etc...)
+        TimeManager::instance().updateTime();
+
         display(window, glfwGetTime());
         processInput(window);//if we processInput after glfwPollEvents, then input will be delayed until the next frame
 
