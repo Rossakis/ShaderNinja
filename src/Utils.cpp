@@ -50,8 +50,11 @@ const GLuint Utils::createShaderProgram(const char* vertFile, const char* fragFi
     // 6) Attach Shaders abd Link the Shader Program
     glAttachShader(program, vertexShader);
     glAttachShader(program, fragShader);
-    glLinkProgram(program);//request to the GLSL compiler to ensure that the shaders are compatible  
     
+    //request to the GLSL compiler to ensure that the shaders are compatible  
+    glLinkProgram(program);
+    printProgramLog(program);
+
     return program;
 }
 
@@ -101,7 +104,7 @@ const GLenum Utils::checkOpenGLError(const char *file, int line)
             case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        std::cout << error << " | " << file << " (" << line - 1 << ")" << std::endl;
+        std::cout << error << " | " << file << " (" << line << ")" << std::endl;
         glfwTerminate();
         exit(EXIT_SUCCESS);
     }

@@ -82,6 +82,13 @@ void scaleTriangle()
     glProgramUniform1f(renderingProgram, scaleLoc, currentSize);
 }
 
+void rotateTriangle()
+{
+     //Change the vertex shader's x-position field
+    GLuint rotateLoc = glGetUniformLocation(renderingProgram, "angle");
+    glProgramUniform1f(renderingProgram, rotateLoc, currentSize);
+}
+
 
 void display(GLFWwindow* window, double currentTime) {
     //Clear buffers for HSR
@@ -94,6 +101,7 @@ void display(GLFWwindow* window, double currentTime) {
 
     moveTriangle();
     scaleTriangle();
+    rotateTriangle();
     
     //Initiate pipeline processing
     glDrawArrays(GL_TRIANGLES, 0, 3); 
