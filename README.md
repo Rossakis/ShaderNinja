@@ -42,3 +42,6 @@ This will create the build files using the compiler available on your operating 
   <br/>
   <br/>
   b) Navigate to the same folder in Explorer (Windows) or Finder (MacOS), and double-click on the created executable.
+
+  
+![ShaderNinja-BasicTriangle](https://github.com/user-attachments/assets/f4234e8d-3dbe-4119-ba2f-c691d88420dd)
