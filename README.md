@@ -43,5 +43,11 @@ This will create the build files using the compiler available on your operating 
   <br/>
   b) Navigate to the same folder in Explorer (Windows) or Finder (MacOS), and double-click on the created executable.
 
-  
+### Alternative to Step 3-4: To both build and run the executable in the "build" directory with one command, you can type:
+  ```
+  cmake --build ./build --target run
+  ```
+  <br/>
+  <br/>
+
 ![ShaderNinja-BasicTriangle](https://github.com/user-attachments/assets/f4234e8d-3dbe-4119-ba2f-c691d88420dd)
