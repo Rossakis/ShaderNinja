@@ -2,6 +2,9 @@
 #include <glad/glad.h>//should always be included before glfw
 #include <GLFW/glfw3.h>
 #include <imgui.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
+#include <glm/gtc/matrix_transform.hpp>
 
 //Standard libraries
 #include <iostream>
@@ -12,18 +15,59 @@
 //Include headers
 #include <Utils.h>
 #include <TimeManager.h>
+#include <ScreenUtils.h>
 
-#define numVAOs 1 // VAO = Vertex Array Objects 
-
+// #define numVAOs 1
+#define numVBOs 2 
 GLuint renderingProgram;
-GLuint vao[numVAOs]; 
+GLint mvLoc, projLoc;//location of the model-view and projection matrix in the shader
 
-//Initializes the OpenGL pipeline (vertex shader, fragment shader, etc...)
+GLuint vao[1]; // VAO = Vertex Array Objects 
+GLuint vbo[numVBOs]; // VBO = Vertex Buffer Objects 
+
+glm::mat4 vMat, mMat, mvMat, projMat; 
+int width, height;
+float aspect;
+
+float cameraX, cameraY, cameraZ;
+float cubeLocX, cubeLocY, cubeLocZ;
+
+void setupVertices(void) {
+     // 12 triangles * 3 vertices * 3 values (x, y, z)
+    float vertexPositions[108] = {
+        -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f, -1.0f,
+         1.0f, -1.0f,  1.0f, -1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f, -1.0f,  1.0f,  1.0f,
+        -1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,
+         1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f,
+        -1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,
+         1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f,
+    };
+    glGenVertexArrays(1, vao);//Create VAOs
+    glBindVertexArray(vao[0]);//Make the VAO active
+
+    glGenBuffers(numVBOs, vbo);//Create VBOs
+
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);//make the "0th" buffer active
+    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);// loads the cube vertices into the 0th VBO buffer
+}
+
 void init(GLFWwindow* window) {
-    renderingProgram = Utils::createShaderProgram("../resources/vertexShader.glsl", "../resources/fragmentShader.glsl");
-    glPointSize(5.0f);
-    glGenVertexArrays(numVAOs, vao);
-    glBindVertexArray(vao[0]);
+    renderingProgram = Utils::createShaderProgram("../resources/shaders/vertexShader.glsl", "../resources/shaders/fragmentShader.glsl");
+    cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
+    cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f;
+
+    // glm::mat4 vMat = glm::mat4(1.0f);
+    // glm::mat4 mMat = glm::mat4(1.0f);
+    // glm::mat4 mvMat = glm::mat4(1.0f);
+    // glm::mat4 projMat = glm::mat4(1.0f);
+
+    setupVertices();
 }
 
 float posX = 0.0f;
@@ -84,9 +128,35 @@ void scaleTriangle()
 
 void rotateTriangle()
 {
-     //Change the vertex shader's x-position field
+    //Change the vertex shader's x-position field
     GLuint rotateLoc = glGetUniformLocation(renderingProgram, "angle");
     glProgramUniform1f(renderingProgram, rotateLoc, currentSize);
+}
+
+void applyMatrices(GLFWwindow* window){
+    // get locations of uniforms in the shader program
+    mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
+    projLoc = glGetUniformLocation(renderingProgram, "proj_matrix"); //get locations of the uniforms in the shader program
+
+    // send matrix data to the uniform variables
+    glfwGetFramebufferSize(window, &width, &height);
+    aspect = (float)width / (float)height;
+    projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians == 60 degrees
+
+    // glm::mat4(1.0f) : an identity matrix
+    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+    
+    mvMat = vMat * mMat;
+    //std::cout << mMat.length << std::endl;
+
+    glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
+    glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
+    
+
+    // glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
+    // glEnableVertexAttribArray(0);
 }
 
 
@@ -99,13 +169,15 @@ void display(GLFWwindow* window, double currentTime) {
     //Load the program with our shaders to the GPU
     glUseProgram(renderingProgram);
 
-    moveTriangle();
-    scaleTriangle();
-    rotateTriangle();
+    applyMatrices(window);
     
-    //Initiate pipeline processing
-    glDrawArrays(GL_TRIANGLES, 0, 3); 
-    Utils::checkOpenGLError(__FILE__, __LINE__);
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // makes the 0th buffer "active"
+    // "vertShader.glsl" location = 0
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);// associates 0th attribute with buffer
+    glEnableVertexAttribArray(0);// enable the 0th vertex attribute
+
+    glDrawArrays(GL_TRIANGLES, 0, 36); 
+    //Utils::checkOpenGLError(__FILE__, __LINE__);
 
     //when depth buffer is cleared, it goes to 1 (farthest from the camera)
 }
@@ -116,17 +188,16 @@ void processInput(GLFWwindow *window)
         glfwSetWindowShouldClose(window, true);
 }
 
-const int SCREEN_WIDTH = 1280;
-const int SCREEN_HEIGHT = 720;
-
 GLFWwindow* setScreenMode(bool isFullScreen) {
-
     if (isFullScreen) {
         GLFWmonitor* monitor = glfwGetPrimaryMonitor();//get current main monitor
         const GLFWvidmode* mode = glfwGetVideoMode(monitor); //set full screen
         return glfwCreateWindow(mode->width, mode->height, "Shader Ninja", monitor, NULL);
     }
-    return glfwCreateWindow(SCREEN_WIDTH, SCREEN_HEIGHT, "Shader Ninja", NULL, NULL);
+    else{
+        ScreenUtils::setResolutionHD(&width, &height);
+        return glfwCreateWindow(width, height, "Shader Ninja", NULL, NULL);
+    }
 }
 
 int main() {
