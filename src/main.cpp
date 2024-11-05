@@ -1,3 +1,5 @@
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+
 //Dependencies
 #include <glad/glad.h>//should always be included before glfw
 #include <GLFW/glfw3.h>
@@ -62,10 +64,10 @@ void init(GLFWwindow* window) {
     cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
     cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f;
 
-    // glm::mat4 vMat = glm::mat4(1.0f);
-    // glm::mat4 mMat = glm::mat4(1.0f);
-    // glm::mat4 mvMat = glm::mat4(1.0f);
-    // glm::mat4 projMat = glm::mat4(1.0f);
+    glm::mat4 vMat(1.0f);
+    glm::mat4 mMat(1.0f);
+    glm::mat4 mvMat(1.0f);
+    glm::mat4 projMat(1.0f);
 
     setupVertices();
 }
@@ -144,8 +146,8 @@ void applyMatrices(GLFWwindow* window){
     projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians == 60 degrees
 
     // glm::mat4(1.0f) : an identity matrix
-    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
-    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
+    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
+    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     
     mvMat = vMat * mMat;
     //std::cout << mMat.length << std::endl;
