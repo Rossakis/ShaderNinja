@@ -146,11 +146,10 @@ void applyMatrices(GLFWwindow* window){
     projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians == 60 degrees
 
     // glm::mat4(1.0f) : an identity matrix
-    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-1.0f, -1.0f, -1.0f));
-    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
+    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
     
     mvMat = vMat * mMat;
-    std::cout << mvMat.length << std::endl;
 
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
@@ -178,7 +177,7 @@ void display(GLFWwindow* window, double currentTime) {
     glEnableVertexAttribArray(0);// enable the 0th vertex attribute
 
     glDrawArrays(GL_TRIANGLES, 0, 36); 
-    //Utils::checkOpenGLError(__FILE__, __LINE__);
+    Utils::checkOpenGLError(__FILE__, __LINE__);
 
     //when depth buffer is cleared, it goes to 1 (farthest from the camera)
 }

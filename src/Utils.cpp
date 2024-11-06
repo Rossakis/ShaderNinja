@@ -110,4 +110,29 @@ const GLenum Utils::checkOpenGLError(const char *file, int line)
     }
     return errorCode;
 }
+
+const void Utils::printMatrixValue(glm::mat4 matrix, bool showColumnMajor){
+    double dArray[16] = {0.0};
+
+    const float *pSource;
+
+    if(showColumnMajor == true)
+        pSource = (const float*)glm::value_ptr(matrix);
+    else{
+        glm::mat4 transMat = glm::transpose(matrix);
+        pSource = (const float*)glm::value_ptr(transMat);
+    }
+
+    for (int i = 0; i < 16; ++i)
+        dArray[i] = pSource[i];            
+
+    std::stringstream ss;
+    ss << std::fixed
+       << "|" << dArray[0] << ", " << dArray[1] << ", " << dArray[2] << ", " << dArray[3] << "|" << "|\n"
+       << "|" << dArray[4] << ", " << dArray[5] << ", " <<  dArray[6] << ", " << dArray[7] << "|" << "|\n"
+       << "|" << dArray[8] << ", " << dArray[9] << ", " <<  dArray[10] << ", " << dArray[11] << "|" << "|\n"
+       << "|" << dArray[12] << ", " << dArray[13] << ", " <<  dArray[14] << ", " << dArray[15] << "|" << "|\n";
+
+    std::cout << ss.str() << std::endl;
+}
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
