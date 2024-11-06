@@ -150,12 +150,11 @@ void applyMatrices(GLFWwindow* window){
     mMat = glm::translate(glm::mat4(1.0f), glm::vec3(1.0f, 1.0f, 1.0f));
     
     mvMat = vMat * mMat;
-    //std::cout << mMat.length << std::endl;
+    std::cout << mvMat.length << std::endl;
 
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
     
-
     // glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
     // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
     // glEnableVertexAttribArray(0);

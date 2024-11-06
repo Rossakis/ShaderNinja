@@ -3,6 +3,7 @@ cmake_minimum_required(VERSION 3.30)
 set(CMAKE_CXX_STANDARD 14)
 
 include(CheckIPOSupported)
+#add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/WX-> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-error>)
 
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
 set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
@@ -25,7 +26,7 @@ add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glad)
 add_subdirectory(dependencies/imgui)
 add_subdirectory(dependencies/stb_image)
-add_subdirectory(dependencies/glm)
+add_subdirectory(dependencies/glm/glm)
 
 # SOURCE_FILES is defined to be a list of all the source files for the game
 # So no need to add the source files by hand, since they are already added with this macro
