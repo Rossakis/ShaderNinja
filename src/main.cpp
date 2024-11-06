@@ -1,4 +1,4 @@
-#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES
+#define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES //make sure types are properly aligned for SIMD operations (e.g. glm's matrix multiplication)
 
 //Dependencies
 #include <glad/glad.h>//should always be included before glfw
@@ -16,11 +16,14 @@
 
 //Include headers
 #include <Utils.h>
-#include <TimeManager.h>
 #include <ScreenUtils.h>
+#include <InputManager.h>
 
 // #define numVAOs 1
 #define numVBOs 2 
+#define MOUSE_SPEED_SCALE_X 0.25f;
+#define MOUSE_SPEED_SCALE_Y 0.25f;
+
 GLuint renderingProgram;
 GLint mvLoc, projLoc;//location of the model-view and projection matrix in the shader
 
@@ -31,8 +34,11 @@ glm::mat4 vMat, mMat, mvMat, projMat;
 int width, height;
 float aspect;
 
-float cameraX, cameraY, cameraZ;
+float cameraPosX, cameraPosY, cameraPosZ;
+float cameraInputX, cameraInputY;
 float cubeLocX, cubeLocY, cubeLocZ;
+float deltaTime;
+float angle;
 
 void setupVertices(void) {
      // 12 triangles * 3 vertices * 3 values (x, y, z)
@@ -50,89 +56,22 @@ void setupVertices(void) {
         -1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,
          1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f,
     };
+
     glGenVertexArrays(1, vao);//Create VAOs
     glBindVertexArray(vao[0]);//Make the VAO active
 
     glGenBuffers(numVBOs, vbo);//Create VBOs
-
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);//make the "0th" buffer active
     glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);// loads the cube vertices into the 0th VBO buffer
 }
 
 void init(GLFWwindow* window) {
     renderingProgram = Utils::createShaderProgram("../resources/shaders/vertexShader.glsl", "../resources/shaders/fragmentShader.glsl");
-    cameraX = 0.0f; cameraY = 0.0f; cameraZ = 8.0f;
+    cameraPosX = 0.0f; cameraPosY = 0.0f; cameraPosZ = 8.0f;
+    cameraInputX = 0.0f, cameraInputY = 0.0f;
     cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f;
-
-    glm::mat4 vMat(1.0f);
-    glm::mat4 mMat(1.0f);
-    glm::mat4 mvMat(1.0f);
-    glm::mat4 projMat(1.0f);
-
+    angle = 0;
     setupVertices();
-}
-
-float posX = 0.0f;
-float inc = 0.5f;
-float currentInc = inc;
-void moveTriangle(){
-    posX += currentInc * TimeManager::instance().getDeltaTime();
-    if(posX > 1.0f)
-        currentInc = -inc;//move to left
-    if(posX < -1.0f)
-        currentInc = inc;//move to right
-
-    //Change the vertex shader's x-position field
-    GLuint offsetLoc = glGetUniformLocation(renderingProgram, "offset");
-    glProgramUniform1f(renderingProgram, offsetLoc, posX);
-}
-
-//Size params
-float maxSize = 2.5f;
-float minSize = 0.25f;
-float currentSize = minSize;
-bool isDecreasing = false;
-void scalePoints()
-{
-    if(!isDecreasing)
-    {
-        isDecreasing = currentSize >= maxSize ? true : false;
-        currentSize += 20.0f * TimeManager::instance().getDeltaTime();
-    }
-
-    if(isDecreasing)
-    {
-        currentSize -= 20.0f * TimeManager::instance().getDeltaTime();
-        isDecreasing = currentSize <= minSize ? false : true;
-    }
-
-    glPointSize(currentSize);
-}
-
-void scaleTriangle()
-{
-    if(!isDecreasing)
-    {
-        isDecreasing = currentSize >= maxSize ? true : false;
-        currentSize += 0.5f * TimeManager::instance().getDeltaTime();
-    }
-
-    if(isDecreasing)
-    {
-        isDecreasing = currentSize <= minSize ? false : true;
-        currentSize -= 0.5f * TimeManager::instance().getDeltaTime();     
-    }
-
-    //Change the vertex shader's x-position field
-    GLuint scaleLoc = glGetUniformLocation(renderingProgram, "scale");
-    glProgramUniform1f(renderingProgram, scaleLoc, currentSize);
-}
-
-void rotateTriangle()
-{
-    //Change the vertex shader's x-position field
-    GLuint rotateLoc = glGetUniformLocation(renderingProgram, "angle");
-    glProgramUniform1f(renderingProgram, rotateLoc, currentSize);
 }
 
 void applyMatrices(GLFWwindow* window){
@@ -140,25 +79,37 @@ void applyMatrices(GLFWwindow* window){
     mvLoc = glGetUniformLocation(renderingProgram, "mv_matrix");
     projLoc = glGetUniformLocation(renderingProgram, "proj_matrix"); //get locations of the uniforms in the shader program
 
-    // send matrix data to the uniform variables
     glfwGetFramebufferSize(window, &width, &height);
     aspect = (float)width / (float)height;
     projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians == 60 degrees
 
-    // glm::mat4(1.0f) : an identity matrix
-    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraX, -cameraY, -cameraZ));
+    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraPosX, -cameraPosY, -cameraPosZ));
     mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
     
+    mMat = glm::rotate(mMat, cameraInputX, glm::vec3(0.0f, 1.0f, 0.0f));//Y-axis
+    mMat = glm::rotate(mMat, cameraInputY, glm::vec3(1.0f, 0.0f, 0.0f));//X-axis
+
     mvMat = vMat * mMat;
 
+    // send matrix data to the uniform variables
     glUniformMatrix4fv(mvLoc, 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(projLoc, 1, GL_FALSE, glm::value_ptr(projMat));
-    
-    // glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
-    // glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);
-    // glEnableVertexAttribArray(0);
 }
 
+void processCameraInput(GLFWwindow *window)
+{
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)//Left
+        cameraPosX -= 5.0f * TimeManager::instance().getDeltaTime();
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)//Right
+        cameraPosX += 5.0f * TimeManager::instance().getDeltaTime();
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)//Up
+        cameraPosY += 5.0f * TimeManager::instance().getDeltaTime();
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)//Down
+        cameraPosY -= 5.0f * TimeManager::instance().getDeltaTime();
+    
+    cameraInputX += InputManager::instance().getMouseDelta().x * MOUSE_SPEED_SCALE_X;
+    cameraInputY += InputManager::instance().getMouseDelta().y * MOUSE_SPEED_SCALE_Y;
+}
 
 void display(GLFWwindow* window, double currentTime) {
     //Clear buffers for HSR
@@ -170,6 +121,7 @@ void display(GLFWwindow* window, double currentTime) {
     glUseProgram(renderingProgram);
 
     applyMatrices(window);
+    processCameraInput(window);
     
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // makes the 0th buffer "active"
     // "vertShader.glsl" location = 0
@@ -178,8 +130,6 @@ void display(GLFWwindow* window, double currentTime) {
 
     glDrawArrays(GL_TRIANGLES, 0, 36); 
     Utils::checkOpenGLError(__FILE__, __LINE__);
-
-    //when depth buffer is cleared, it goes to 1 (farthest from the camera)
 }
 
 void processInput(GLFWwindow *window)
@@ -230,8 +180,9 @@ int main() {
     init(window);
     //Wait until user closes the window
     while (!glfwWindowShouldClose(window)) {
-        //TODO: create a wrapper class that updates all the Manager type classes (TimeManager, etc...)
         TimeManager::instance().updateTime();
+        InputManager::instance().updateInput(window);
+        deltaTime = TimeManager::instance().getDeltaTime();
 
         display(window, glfwGetTime());
         processInput(window);//if we processInput after glfwPollEvents, then input will be delayed until the next frame

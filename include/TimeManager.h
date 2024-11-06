@@ -1,5 +1,6 @@
 #include <iostream>
 #include <glad/glad.h>
+#include <glfw/glfw3.h>
 
 class TimeManager {
 public:
@@ -9,7 +10,7 @@ public:
     }    
     void updateTime();
     float getDeltaTime() const; // const member function (const is declared after func name) means the class members won't be changed by this func
-
+    
 private:
     TimeManager();
     TimeManager(const TimeManager&) = delete; // Deletes copy constructor
