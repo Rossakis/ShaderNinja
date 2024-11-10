@@ -1,5 +1,3 @@
-#include <iostream>
-#include <glad/glad.h>
 #include <TimeManager.h>
 #include <glm/glm.hpp>
 
