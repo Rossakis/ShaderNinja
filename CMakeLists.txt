@@ -1,21 +1,21 @@
-cmake_minimum_required(VERSION 3.30)
-
-set(CMAKE_CXX_STANDARD 14)
-
-include(CheckIPOSupported)
-#add_compile_options($<$<CXX_COMPILER_ID:MSVC>:/WX-> $<$<NOT:$<CXX_COMPILER_ID:MSVC>>:-Wno-error>)
-
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
-set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
-
-set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE) #link time optimization
-
-if(MSVC)
-    add_compile_options(/arch:AVX2) #make sure SIMD optimizations take place
-endif()
-
+cmake_minimum_required(VERSION 3.16)
 project(ShaderNinja)
 
+set(CMAKE_CXX_STANDARD 17)
+
+include(CheckIPOSupported)
+check_ipo_supported(RESULT ipo_supported OUTPUT error)
+if(ipo_supported)
+    set(CMAKE_INTERPROCEDURAL_OPTIMIZATION TRUE)
+endif()
+
+if(MSVC)
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Release>:Release>")
+    set(CMAKE_MSVC_RUNTIME_LIBRARY "MultiThreaded$<$<CONFIG:Debug>:Debug>")
+    add_compile_options(/arch:AVX2)
+endif()
+
+# Disable unnecessary GLFW build options
 set(GLFW_BUILD_DOCS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_TESTS OFF CACHE BOOL "" FORCE)
 set(GLFW_BUILD_EXAMPLES OFF CACHE BOOL "" FORCE)
@@ -26,39 +26,38 @@ add_subdirectory(dependencies/glfw)
 add_subdirectory(dependencies/glad)
 add_subdirectory(dependencies/imgui)
 add_subdirectory(dependencies/stb_image)
-add_subdirectory(dependencies/glm/glm)
+add_subdirectory(dependencies/glm)
 
-# SOURCE_FILES is defined to be a list of all the source files for the game
-# So no need to add the source files by hand, since they are already added with this macro
-file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
+# Collect all source files
+file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS 
+"${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
 add_executable("${CMAKE_PROJECT_NAME}")
 
-set_property(TARGET "${CMAKE_PROJECT_NAME}" PROPERTY CXX_STANDARD 17)
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC GLFW_INCLUDE_NONE=1)
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/")
-target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC PRODUCTION_BUILD=0)
+target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC 
+    GLFW_INCLUDE_NONE=1 
+    RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/" 
+    PRODUCTION_BUILD=0
+)
 
-target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${SOURCE_FILES} )
+target_sources("${CMAKE_PROJECT_NAME}" PRIVATE ${SOURCE_FILES})
 
-
-if(MSVC) # If using the VS compiler...
+if(MSVC)
     target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC _CRT_SECURE_NO_WARNINGS)
-    set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup") #no console
+    set_target_properties("${CMAKE_PROJECT_NAME}" PROPERTIES LINK_FLAGS "/SUBSYSTEM:WINDOWS /ENTRY:mainCRTStartup")
 endif()
 
-target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}/include/")
+target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
+    "${CMAKE_CURRENT_SOURCE_DIR}/include"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/dependencies" 
+)
 
-#enet not working yet on linux for some reason
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui glm stb_image)
-
 
 # Add a custom target to build and run the project
 add_custom_target(run
-    COMMAND "${CMAKE_PROJECT_NAME}" 
+    COMMAND $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
     DEPENDS "${CMAKE_PROJECT_NAME}"
     WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
 )
-
-# With this, you will be able to both build and run the program with a single command "cmake --build ./build --target run  "
-add_dependencies(run "${CMAKE_PROJECT_NAME}") 
+add_dependencies(run "${CMAKE_PROJECT_NAME}")

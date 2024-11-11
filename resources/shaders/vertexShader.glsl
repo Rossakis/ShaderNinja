@@ -1,4 +1,4 @@
-#version 430 core
+#version 410 core
 //'layout (location = 0)' : layout qualifier
 // in : input (there also exists 'out' type)
 // position : name of the variable
