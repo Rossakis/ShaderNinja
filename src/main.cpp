@@ -21,6 +21,10 @@
 
 // #define numVAOs 1
 #define numVBOs 2 
+#define CAMERA_SPEED_SCALE_X 5.0f;
+#define CAMERA_SPEED_SCALE_Y 5.0f;
+#define CAMERA_SPEED_SCALE_Z 5.0f;
+
 #define MOUSE_SPEED_SCALE_X 0.25f;
 #define MOUSE_SPEED_SCALE_Y 0.25f;
 
@@ -81,13 +85,13 @@ void applyMatrices(GLFWwindow* window){
 
     glfwGetFramebufferSize(window, &width, &height);
     aspect = (float)width / (float)height;
-    projMat = glm::perspective(1.0472f, aspect, 0.1f, 1000.0f); // 1.0472 radians == 60 degrees
+    projMat = glm::perspective(glm::radians(60.0f), aspect, 0.1f, 1000.0f);
 
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraPosX, -cameraPosY, -cameraPosZ));
     mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
     
     mMat = glm::rotate(mMat, cameraInputX, glm::vec3(0.0f, 1.0f, 0.0f));//Y-axis
-    mMat = glm::rotate(mMat, cameraInputY, glm::vec3(1.0f, 0.0f, 0.0f));//X-axis
+    mMat = glm::rotate(mMat, -cameraInputY, glm::vec3(1.0f, 0.0f, 0.0f));//X-axis
 
     mvMat = vMat * mMat;
 
@@ -98,14 +102,18 @@ void applyMatrices(GLFWwindow* window){
 
 void processCameraInput(GLFWwindow *window)
 {
-    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS)//Left
-        cameraPosX -= 5.0f * TimeManager::instance().getDeltaTime();
-    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS)//Right
-        cameraPosX += 5.0f * TimeManager::instance().getDeltaTime();
-    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS)//Up
-        cameraPosY += 5.0f * TimeManager::instance().getDeltaTime();
-    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS)//Down
-        cameraPosY -= 5.0f * TimeManager::instance().getDeltaTime();
+    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) //Left
+        cameraPosX -= deltaTime * CAMERA_SPEED_SCALE_X;
+    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) //Right
+        cameraPosX += deltaTime * CAMERA_SPEED_SCALE_X;
+    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) //Down
+        cameraPosY -= deltaTime * CAMERA_SPEED_SCALE_Y;
+    if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) //Up
+        cameraPosY += deltaTime * CAMERA_SPEED_SCALE_Y;
+    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) //Front
+        cameraPosZ -= deltaTime * CAMERA_SPEED_SCALE_Z;
+    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) //Back
+        cameraPosZ += deltaTime * CAMERA_SPEED_SCALE_Z;
     
     cameraInputX += InputManager::instance().getMouseDelta().x * MOUSE_SPEED_SCALE_X;
     cameraInputY += InputManager::instance().getMouseDelta().y * MOUSE_SPEED_SCALE_Y;
@@ -114,7 +122,6 @@ void processCameraInput(GLFWwindow *window)
 void display(GLFWwindow* window, double currentTime) {
     //Clear buffers for HSR
     glClear(GL_DEPTH_BUFFER_BIT);
-    glClearColor(0.0, 0.0, 0.0, 1.0);
     glClear(GL_COLOR_BUFFER_BIT);
 
     //Load the program with our shaders to the GPU
@@ -123,10 +130,15 @@ void display(GLFWwindow* window, double currentTime) {
     applyMatrices(window);
     processCameraInput(window);
     
+    //associate VBO with the corresponding vertex attribute in vertex shader
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // makes the 0th buffer "active"
-    // "vertShader.glsl" location = 0
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);// associates 0th attribute with buffer
     glEnableVertexAttribArray(0);// enable the 0th vertex attribute
+
+    //adjust Opengl settings and draw model
+    glEnable(GL_DEPTH_TEST);//enable depth testing
+    glDepthFunc(GL_LEQUAL);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     glDrawArrays(GL_TRIANGLES, 0, 36); 
     Utils::checkOpenGLError(__FILE__, __LINE__);
