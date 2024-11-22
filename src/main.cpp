@@ -72,6 +72,8 @@ void setupVertices(void) {
 
 void init(GLFWwindow* window) {
     renderingProgram = Utils::createShaderProgram("../resources/shaders/vertexShader.glsl", "../resources/shaders/fragmentShader.glsl");
+    GLuint texture = Utils::loadTexture("../resources/textures/WallTexture.png");
+
     cameraPosX = 0.0f; cameraPosY = 0.0f; cameraPosZ = 8.0f;
     cameraInputX = 0.0f, cameraInputY = 0.0f;
     cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f;
@@ -159,7 +161,7 @@ GLFWwindow* setScreenMode(bool isFullScreen) {
         return glfwCreateWindow(mode->width, mode->height, "Shader Ninja", monitor, NULL);
     }
     else{
-        ScreenUtils::setResolutionHD(&width, &height);
+        ScreenUtils::setResolutionFHD(&width, &height);
         return glfwCreateWindow(width, height, "Shader Ninja", NULL, NULL);
     }
 }

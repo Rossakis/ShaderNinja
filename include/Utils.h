@@ -13,7 +13,7 @@
 class Utils {
     public: 
         //Shader Reading-Creation
-        static const std::string readShaderFile(const char* shaderFileName);
+        static const std::string readShaderFile(const char* shaderFilePath);
         static const GLuint createShaderProgram(const char* vertFile, const char* fragFile);
         
         //OpenGL/Shader Debug
@@ -24,4 +24,8 @@ class Utils {
         //GLM Debug
         //By default, glm matrices are column-major
         static const void printMatrixValue(glm::mat4 matrix, bool showColumnMajor = true);
+
+        //Texture
+        static const GLuint loadTexture(const char* textureImagePath);
+
 };

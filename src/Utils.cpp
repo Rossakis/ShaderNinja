@@ -1,7 +1,9 @@
 #include <Utils.h>
 
-const std::string Utils::readShaderFile(const char* shaderFileName){
-        std::ifstream shaderFile (shaderFileName);
+#define glCheckError() glCheckError_(__FILE__, __LINE__)
+
+const std::string Utils::readShaderFile(const char* shaderFilePath){
+        std::ifstream shaderFile (shaderFilePath);
         std::string outputString = "";
         
         if(shaderFile.is_open()){
@@ -14,7 +16,7 @@ const std::string Utils::readShaderFile(const char* shaderFileName){
             shaderFile.close(); 
         }
          else 
-            std::cerr << "Error opening file: " << shaderFileName << std::endl;
+            std::cerr << "Error opening file: " << shaderFilePath << std::endl;
     
 
         return outputString;
@@ -135,4 +137,18 @@ const void Utils::printMatrixValue(glm::mat4 matrix, bool showColumnMajor){
 
     std::cout << ss.str() << std::endl;
 }
-#define glCheckError() glCheckError_(__FILE__, __LINE__)
+
+
+const GLuint Utils::loadTexture(const char* textureImagePath){
+        GLuint textureId;
+        textureId = SOIL_load_OGL_texture(textureImagePath, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
+
+        if(textureId == 0){
+            std::cout << "Could not find texture file: " << textureImagePath << std::endl;
+            glfwTerminate();
+            exit(EXIT_SUCCESS);
+        }
+    };
+
+
+
