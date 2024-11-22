@@ -15,3 +15,5 @@ cmake-build-debug
 build
 .idea
 .vscode
+.vs
+out

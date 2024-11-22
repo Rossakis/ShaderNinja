@@ -27,6 +27,7 @@ add_subdirectory(dependencies/glad)
 add_subdirectory(dependencies/imgui)
 add_subdirectory(dependencies/stb_image)
 add_subdirectory(dependencies/glm/glm)
+add_subdirectory(dependencies/SOIL2)
 
 # Collect all source files
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS 
@@ -52,7 +53,7 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/dependencies" 
 )
 
-target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui glm::glm-header-only stb_image)
+target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui glm::glm-header-only stb_image SOIL2)
 
 # Add a custom target to build and run the project
 add_custom_target(run

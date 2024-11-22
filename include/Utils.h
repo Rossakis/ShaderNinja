@@ -7,6 +7,7 @@
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
+#include <SOIL2/src/SOIL2/SOIL2.h>
 
 /// @brief A helper class that contains useful utility methods, such as reading shader files
 class Utils {
