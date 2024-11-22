@@ -50,4 +50,5 @@ This will create the build files using the compiler available on your operating 
   <br/>
   <br/>
 
-![ShaderNinja-BasicTriangle](https://github.com/user-attachments/assets/f4234e8d-3dbe-4119-ba2f-c691d88420dd)
+![ShaderNinja-Instancing-100K-Cubes](https://github.com/user-attachments/assets/4a294322-d9c3-41e1-a347-99a3c70519d5)
+
