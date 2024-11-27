@@ -1,3 +1,6 @@
+#ifndef INPUTMANAGER_H
+#define INPUTMANAGER_H
+
 #include <TimeManager.h>
 #include <glm/glm.hpp>
 
@@ -23,3 +26,5 @@ private:
     glm::vec2 lastMousePos;
     glm::vec2 mouseDeltaPos;
 };
+
+#endif

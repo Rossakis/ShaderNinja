@@ -23,8 +23,8 @@ void main(void) {
     
     mat4 localTrans = buildTranslate(a, b, c);
     
-    // mat4 finalM = mvMat * localTrans;
-    // gl_Position = projMat * finalM * vec4(position, 1.0); //randomly translate objects
+    //mat4 finalM = mvMat * localTrans;
+    //gl_Position = projMat * finalM * vec4(position, 1.0); //randomly translate objects
     gl_Position = projMat * mvMat * vec4(position, 1.0);
     
     varyingColor = vec4(position, 1.0) * 0.5 + vec4(0.5, 0.5, 0.5, 0.5);

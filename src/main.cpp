@@ -1,22 +1,11 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES //make sure types are properly aligned for SIMD operations (e.g. glm's matrix multiplication)
 
-//Dependencies
-#include <glad/glad.h>//should always be included before glfw
-#include <GLFW/glfw3.h>
-#include <imgui.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-
-//Standard libraries
-#include <stdexcept>
-#include <cstdlib>
-#include <cmath>
-
-//Include headers
+#include <Common.h>
 #include <Utils.h>
 #include <ScreenUtils.h>
 #include <InputManager.h>
+#include <Texture.h>
+#include <Primitive.h>
 
 #define numVBOs 2 
 #define CAMERA_SPEED_SCALE_X 5.0f;
@@ -45,9 +34,11 @@ float deltaTime;
 float angle;
 float cameraBonusSpeed;
 
-void setupVertices(void) {
-     // 12 triangles * 3 vertices * 3 values (x, y, z)
-    float vertexPositions[108] = {
+//Game objects
+Texture* cubeTexture;
+
+void setupVertices(void) {    
+    float vertices[] = {
         -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f, -1.0f,
          1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
          1.0f, -1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f, -1.0f,
@@ -61,19 +52,21 @@ void setupVertices(void) {
         -1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,
          1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f,
     };
-
     glGenVertexArrays(1, vao);//Create VAOs
     glBindVertexArray(vao[0]);//Make the VAO active
-
     glGenBuffers(numVBOs, vbo);//Create VBOs
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);//make the "0th" buffer active
-    glBufferData(GL_ARRAY_BUFFER, sizeof(vertexPositions), vertexPositions, GL_STATIC_DRAW);// loads the cube vertices into the 0th VBO buffer
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Primitive::CUBE_VERTICES), Primitive::CUBE_VERTICES, GL_STATIC_DRAW);// loads the cube vertices into the 0th VBO buffer
 }
 
 void init(GLFWwindow* window) {
+    //Shader
     renderingProgram = Utils::createShaderProgram("../resources/shaders/vertexShader.glsl", "../resources/shaders/fragmentShader.glsl");
-    GLuint texture = Utils::loadTexture("../resources/textures/WallTexture.png");
+    
+    //Texture
+    cubeTexture = new Texture("../resources/textures/WallTexture.png");
 
+    //Default Values
     cameraPosX = 0.0f; cameraPosY = 0.0f; cameraPosZ = 8.0f;
     cameraInputX = 0.0f, cameraInputY = 0.0f;
     cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f;

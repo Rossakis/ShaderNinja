@@ -1,13 +1,7 @@
-#include <fstream>
-#include <string>
-#include <iostream>
-#include <sstream>
-#include <glad/glad.h>
-#include <glfw/glfw3.h>
-#include <glm/glm.hpp>
-#include <glm/gtc/type_ptr.hpp>
-#include <glm/gtc/matrix_transform.hpp>
-#include <SOIL2/src/SOIL2/SOIL2.h>
+#ifndef UTILS_H
+#define UTILS_H
+
+#include <Common.h>
 
 /// @brief A helper class that contains useful utility methods, such as reading shader files
 class Utils {
@@ -24,8 +18,6 @@ class Utils {
         //GLM Debug
         //By default, glm matrices are column-major
         static const void printMatrixValue(glm::mat4 matrix, bool showColumnMajor = true);
-
-        //Texture
-        static const GLuint loadTexture(const char* textureImagePath);
-
 };
+
+#endif

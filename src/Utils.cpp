@@ -139,16 +139,3 @@ const void Utils::printMatrixValue(glm::mat4 matrix, bool showColumnMajor){
 }
 
 
-const GLuint Utils::loadTexture(const char* textureImagePath){
-        GLuint textureId;
-        textureId = SOIL_load_OGL_texture(textureImagePath, SOIL_LOAD_AUTO, SOIL_CREATE_NEW_ID, SOIL_FLAG_INVERT_Y);
-
-        if(textureId == 0){
-            std::cout << "Could not find texture file: " << textureImagePath << std::endl;
-            glfwTerminate();
-            exit(EXIT_SUCCESS);
-        }
-    };
-
-
-

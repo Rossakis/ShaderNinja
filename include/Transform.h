@@ -1,3 +1,6 @@
+#ifndef TRANSFORM_H
+#define TRANSFORM_H
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -37,3 +40,5 @@ glm::mat4 scaleXYZ(float x, float y, float z)
                 0.0, 0.0, 0.0, 1.0);
 }
 };
+
+#endif

@@ -1,3 +1,5 @@
+#ifndef SCREENUTILS_H
+#define SCREENUTILS_H
 
 class ScreenUtils{
     public:
@@ -15,3 +17,5 @@ class ScreenUtils{
             *height = FHD_SCREEN_HEIGHT;
         }
 };
+
+#endif
