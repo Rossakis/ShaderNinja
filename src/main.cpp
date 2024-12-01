@@ -20,7 +20,7 @@
 GLuint renderingProgram;
 GLint mvLoc, projLoc;//location of the model-view and projection matrix in the shader
 
-GLuint vao[1]; // VAO = Vertex Array Objects 
+GLuint vao[1]; // VAO = Vertex Array Objects
 GLuint vbo[numVBOs]; // VBO = Vertex Buffer Objects 
 
 glm::mat4 vMat, mMat, mvMat, projMat, trMat; 
@@ -38,25 +38,21 @@ float cameraBonusSpeed;
 Texture* cubeTexture;
 
 void setupVertices(void) {    
-    float vertices[] = {
-        -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f, -1.0f,
-         1.0f, -1.0f,  1.0f, -1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f, -1.0f, -1.0f,  1.0f, -1.0f, -1.0f,  1.0f,  1.0f,
-        -1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f, -1.0f,
-         1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f, -1.0f,  1.0f,
-        -1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f,  1.0f,
-         1.0f,  1.0f,  1.0f, -1.0f,  1.0f,  1.0f, -1.0f,  1.0f, -1.0f,
-    };
     glGenVertexArrays(1, vao);//Create VAOs
     glBindVertexArray(vao[0]);//Make the VAO active
     glGenBuffers(numVBOs, vbo);//Create VBOs
+
+    //Cube
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);//make the "0th" buffer active
     glBufferData(GL_ARRAY_BUFFER, sizeof(Primitive::CUBE_VERTICES), Primitive::CUBE_VERTICES, GL_STATIC_DRAW);// loads the cube vertices into the 0th VBO buffer
+
+    //Cube-Texture
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, sizeof(Primitive::CUBE_TEXTURE_VERTICES), Primitive::CUBE_TEXTURE_VERTICES, GL_STATIC_DRAW);
+    
+    //Pyramid
+    // glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    // glBufferData(GL_ARRAY_BUFFER, sizeof(Primitive::PYRAMID_VERTICES), Primitive::PYRAMID_VERTICES, GL_STATIC_DRAW);
 }
 
 void init(GLFWwindow* window) {
@@ -64,7 +60,7 @@ void init(GLFWwindow* window) {
     renderingProgram = Utils::createShaderProgram("../resources/shaders/vertexShader.glsl", "../resources/shaders/fragmentShader.glsl");
     
     //Texture
-    cubeTexture = new Texture("../resources/textures/WallTexture.png");
+    cubeTexture = new Texture("../resources/textures/Brick-Wall.jpg");
 
     //Default Values
     cameraPosX = 0.0f; cameraPosY = 0.0f; cameraPosZ = 8.0f;
@@ -128,16 +124,28 @@ void display(GLFWwindow* window, double currentTime) {
     processCameraInput(window);
     applyMatrices(window, (float)currentTime);
     
+    //Cube 
     //associate VBO with the corresponding vertex attribute in vertex shader
     glBindBuffer(GL_ARRAY_BUFFER, vbo[0]); // makes the 0th buffer "active"
     glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, 0);// associates 0th attribute with buffer
     glEnableVertexAttribArray(0);// enable the 0th vertex attribute
+
+    //Texture
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, 0);
+    glEnableVertexAttribArray(1);
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, cubeTexture->GetTextureId());
+    glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR_MIPMAP_LINEAR);
+    glGenerateMipmap(GL_TEXTURE_2D);
     
     //adjust Opengl settings and draw model
     glEnable(GL_DEPTH_TEST);//enable depth testing
     glDepthFunc(GL_LEQUAL);
-    glDrawArraysInstanced(GL_TRIANGLES, 0, 36, 1); 
+    glDrawArrays(GL_TRIANGLES, 0, 36); 
     
+    //TODO: implement this with event system
     Utils::checkOpenGLError(__FILE__, __LINE__);
 }
 

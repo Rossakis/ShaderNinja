@@ -1,5 +1,4 @@
-#ifndef COMMON_H
-#define COMMON_H
+#pragma once
 
 //Standard libraries
 #include <fstream>
@@ -18,5 +17,3 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <SOIL2/src/SOIL2/SOIL2.h>
-
-#endif  

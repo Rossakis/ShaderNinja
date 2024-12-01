@@ -1,5 +1,4 @@
-#ifndef UTILS_H
-#define UTILS_H
+#pragma once
 
 #include <Common.h>
 
@@ -19,5 +18,3 @@ class Utils {
         //By default, glm matrices are column-major
         static const void printMatrixValue(glm::mat4 matrix, bool showColumnMajor = true);
 };
-
-#endif

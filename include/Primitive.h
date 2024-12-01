@@ -1,5 +1,4 @@
-#ifndef PRIMITIVE_H
-#define PRIMITIVE_H
+#pragma once
 
 #include <Texture.h>
 #include <array>
@@ -16,7 +15,8 @@ class Primitive{
 
         const void LoadTexture(const Texture* texturePath);
         static const float CUBE_VERTICES[108];
+        static const float CUBE_TEXTURE_VERTICES[72];
+        static const float PYRAMID_VERTICES[54];
+        static const float PYRAMID_TEXTURE_VERTICES[36];
 };
 
-
-#endif

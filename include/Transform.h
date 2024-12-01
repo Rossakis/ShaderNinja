@@ -1,5 +1,4 @@
-#ifndef TRANSFORM_H
-#define TRANSFORM_H
+#pragma once
 
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -40,5 +39,3 @@ glm::mat4 scaleXYZ(float x, float y, float z)
                 0.0, 0.0, 0.0, 1.0);
 }
 };
-
-#endif

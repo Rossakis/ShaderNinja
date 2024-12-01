@@ -1,5 +1,4 @@
-#ifndef TIMEMANAGER_H
-#define TIMEMANAGER_H
+#pragma once
 
 #include <iostream>
 #include <glad/glad.h>
@@ -22,5 +21,3 @@ private:
     float lastTimeStamp;
     float deltaTime;
 };
-
-#endif
