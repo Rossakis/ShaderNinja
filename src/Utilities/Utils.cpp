@@ -113,7 +113,7 @@ const GLenum Utils::checkOpenGLError(const char *file, int line)
     return errorCode;
 }
 
-const void Utils::printMatrixValue(glm::mat4 matrix, bool showColumnMajor){
+const void Utils::printMatrix4Value(glm::mat4 matrix, bool showColumnMajor){
     double dArray[16] = {0.0};
 
     const float *pSource;
@@ -137,5 +137,12 @@ const void Utils::printMatrixValue(glm::mat4 matrix, bool showColumnMajor){
 
     std::cout << ss.str() << std::endl;
 }
+
+const void Utils::printVector3Value(glm::vec3 vector){ 
+    std::stringstream ss;
+    ss << std::fixed << std::setprecision(3) << "(" << vector.x << ", " << vector.y << ", " << vector.z << ")";;
+    std::cout << ss.str() << std::endl;
+}
+
 
 

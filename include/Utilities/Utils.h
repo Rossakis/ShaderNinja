@@ -1,6 +1,6 @@
 #pragma once
 
-#include <Common.h>
+#include <CommonIncludes.h>
 
 /// @brief A helper class that contains useful utility methods, such as reading shader files
 class Utils {
@@ -16,5 +16,6 @@ class Utils {
 
         //GLM Debug
         //By default, glm matrices are column-major
-        static const void printMatrixValue(glm::mat4 matrix, bool showColumnMajor = true);
+        static const void printMatrix4Value(glm::mat4 matrix, bool showColumnMajor = true);
+        static const void printVector3Value(glm::vec3 vector);
 };

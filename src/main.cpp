@@ -1,21 +1,14 @@
 #define GLM_FORCE_DEFAULT_ALIGNED_GENTYPES //make sure types are properly aligned for SIMD operations (e.g. glm's matrix multiplication)
 
-#include <Common.h>
+#include <CommonIncludes.h>
 #include <Utils.h>
 #include <ScreenUtils.h>
 #include <InputManager.h>
 #include <Texture.h>
 #include <Primitive.h>
+#include <Camera.h>
 
 #define numVBOs 2 
-#define CAMERA_SPEED_SCALE_X 5.0f;
-#define CAMERA_SPEED_SCALE_Y 5.0f;
-#define CAMERA_SPEED_SCALE_Z 5.0f;
-
-#define CAMERA_BONUS_SPEED 5.0f;
-
-#define MOUSE_SPEED_SCALE_X 0.25f;
-#define MOUSE_SPEED_SCALE_Y 0.25f;
 
 GLuint renderingProgram;
 GLint mvLoc, projLoc;//location of the model-view and projection matrix in the shader
@@ -27,15 +20,17 @@ glm::mat4 vMat, mMat, mvMat, projMat, trMat;
 int width, height;
 float aspect;
 
-float cameraPosX, cameraPosY, cameraPosZ;
+//float cameraPosX, cameraPosY, cameraPosZ;
 float cameraInputX, cameraInputY;
-float cubeLocX, cubeLocY, cubeLocZ;
-float deltaTime;
+glm::vec3 cubeLoc;
 float angle;
 float cameraBonusSpeed;
 
 //Game objects
 Texture* cubeTexture;
+Camera* camera;
+InputManager* inputManager;
+TimeManager* timeManager;
 
 void setupVertices(void) {    
     glGenVertexArrays(1, vao);//Create VAOs
@@ -56,16 +51,15 @@ void setupVertices(void) {
 }
 
 void init(GLFWwindow* window) {
-    //Shader
-    renderingProgram = Utils::createShaderProgram("../resources/shaders/vertexShader.glsl", "../resources/shaders/fragmentShader.glsl");
-    
-    //Texture
-    cubeTexture = new Texture("../resources/textures/Brick-Wall.jpg");
+    timeManager = new TimeManager();
+    inputManager = new InputManager(*window, *timeManager);
+    camera = new Camera(*timeManager, *inputManager);
+    camera->SetPos(glm::vec3(0.0f, -2.0f, 7.5f));
 
-    //Default Values
-    cameraPosX = 0.0f; cameraPosY = 0.0f; cameraPosZ = 8.0f;
-    cameraInputX = 0.0f, cameraInputY = 0.0f;
-    cubeLocX = 0.0f; cubeLocY = -2.0f; cubeLocZ = 0.0f;
+    renderingProgram = Utils::createShaderProgram("../resources/shaders/vertexShader.glsl", "../resources/shaders/fragmentShader.glsl");
+    cubeTexture = new Texture("../resources/textures/Brick-Wall.jpg");
+    
+    cubeLoc = glm::vec3(0.0f, -2.0f, 0.0f);
     angle = 0;
 
     glfwGetFramebufferSize(window, &width, &height);
@@ -75,36 +69,11 @@ void init(GLFWwindow* window) {
     setupVertices();
 }
 
-void processCameraInput(GLFWwindow *window)
-{
-     if(glfwGetKey(window, GLFW_KEY_LEFT_SHIFT) == GLFW_PRESS){ //SPEED UP
-        cameraBonusSpeed = CAMERA_BONUS_SPEED;
-        }
-    else
-        cameraBonusSpeed = 1;
-
-    if(glfwGetKey(window, GLFW_KEY_A) == GLFW_PRESS) //Left
-        cameraPosX -= deltaTime * cameraBonusSpeed * CAMERA_SPEED_SCALE_X;
-    if(glfwGetKey(window, GLFW_KEY_D) == GLFW_PRESS) //Right
-        cameraPosX += deltaTime * cameraBonusSpeed * CAMERA_SPEED_SCALE_X;
-    if(glfwGetKey(window, GLFW_KEY_Q) == GLFW_PRESS) //Down
-        cameraPosY -= deltaTime * cameraBonusSpeed* CAMERA_SPEED_SCALE_Y;
-    if(glfwGetKey(window, GLFW_KEY_E) == GLFW_PRESS) //Up
-        cameraPosY += deltaTime * cameraBonusSpeed* CAMERA_SPEED_SCALE_Y;
-    if(glfwGetKey(window, GLFW_KEY_W) == GLFW_PRESS) //Front
-        cameraPosZ -= deltaTime * cameraBonusSpeed* CAMERA_SPEED_SCALE_Z;
-    if(glfwGetKey(window, GLFW_KEY_S) == GLFW_PRESS) //Back
-        cameraPosZ += deltaTime * cameraBonusSpeed* CAMERA_SPEED_SCALE_Z;
-
-    cameraInputX += InputManager::instance().getMouseDelta().x * MOUSE_SPEED_SCALE_X;
-    cameraInputY -= InputManager::instance().getMouseDelta().y * MOUSE_SPEED_SCALE_Y;
-}
-
 void applyMatrices(GLFWwindow* window, float currentTime){    
-    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-cameraPosX, -cameraPosY, -cameraPosZ));
-    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLocX, cubeLocY, cubeLocZ));
-    mMat = glm::rotate(mMat, cameraInputX, glm::vec3(0.0f, 1.0f, 0.0f));//Y-axis
-    mMat = glm::rotate(mMat, -cameraInputY, glm::vec3(1.0f, 0.0f, 0.0f));//X-axis
+    vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-camera->GetPos().x, -camera->GetPos().y, -camera->GetPos().z));
+    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubeLoc.x, cubeLoc.y, cubeLoc.z));
+    mMat = glm::rotate(mMat, camera->GetRot().x, glm::vec3(0.0f, 1.0f, 0.0f));//Y-axis
+    mMat = glm::rotate(mMat, -camera->GetRot().y, glm::vec3(1.0f, 0.0f, 0.0f));//X-axis
     mvMat = vMat * mMat;
 
     // send matrix data to the uniform variables
@@ -120,8 +89,6 @@ void display(GLFWwindow* window, double currentTime) {
 
     //Load the program with our shaders to the GPU
     glUseProgram(renderingProgram);
-
-    processCameraInput(window);
     applyMatrices(window, (float)currentTime);
     
     //Cube 
@@ -147,12 +114,6 @@ void display(GLFWwindow* window, double currentTime) {
     
     //TODO: implement this with event system
     Utils::checkOpenGLError(__FILE__, __LINE__);
-}
-
-void processInput(GLFWwindow *window)
-{
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
 }
 
 GLFWwindow* setScreenMode(bool isFullScreen) {
@@ -197,12 +158,14 @@ int main() {
     init(window);
     //Wait until user closes the window
     while (!glfwWindowShouldClose(window)) {
-        TimeManager::instance().updateTime();
-        InputManager::instance().updateInput(window);
-        deltaTime = TimeManager::instance().getDeltaTime();
-
+        timeManager->UpdateTime();
+        inputManager->UpdateInput();
+        camera->UpdatePos();
+        camera->UpdateRot();
         display(window, glfwGetTime());
-        processInput(window);//if we processInput after glfwPollEvents, then input will be delayed until the next frame
+
+        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
 
         glfwSwapBuffers(window);//GLFW windows are double-buffered (meaning there are two color buffers)
         glfwPollEvents();//poll event for input (mouse, keyboard, joystick, etc...)

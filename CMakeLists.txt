@@ -49,6 +49,12 @@ endif()
 
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/include"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Core"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Game"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Graphics"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Physics"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Scene"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/include/Utilities"  
     "${CMAKE_CURRENT_SOURCE_DIR}/dependencies" 
 )
 
