@@ -9,7 +9,9 @@
 #include <iomanip>
 #include <cmath>
 #include <cstdlib>
+#include <vector>
 #include <array>
+#include <stack>
 
 //Thid-party Dependencies
 #include <glad/glad.h>//should always be included before glfw

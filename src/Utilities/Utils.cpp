@@ -106,7 +106,7 @@ const GLenum Utils::checkOpenGLError(const char *file, int line)
             case GL_OUT_OF_MEMORY:                 error = "OUT_OF_MEMORY"; break;
             case GL_INVALID_FRAMEBUFFER_OPERATION: error = "INVALID_FRAMEBUFFER_OPERATION"; break;
         }
-        std::cout << error << " | " << file << " (" << line << ")" << std::endl;
+        std::cout << "\n" << error << " | " << file << " (" << line << ")" << "\n"  << std::endl;
         glfwTerminate();
         exit(EXIT_SUCCESS);
     }

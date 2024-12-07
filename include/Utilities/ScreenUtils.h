@@ -15,4 +15,16 @@ class ScreenUtils{
             *width = FHD_SCREEN_WIDTH;
             *height = FHD_SCREEN_HEIGHT;
         }
+
+        static GLFWwindow* setScreenMode(bool isFullScreen, int width, int height){
+            if (isFullScreen) {
+                GLFWmonitor* monitor = glfwGetPrimaryMonitor();//get current main monitor
+                const GLFWvidmode* mode = glfwGetVideoMode(monitor); //set full screen
+                return glfwCreateWindow(mode->width, mode->height, "Shader Ninja", monitor, NULL);
+            }
+            else{
+                ScreenUtils::setResolutionFHD(&width, &height);
+                return glfwCreateWindow(width, height, "Shader Ninja", NULL, NULL);
+            }
+        }
 };
