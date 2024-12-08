@@ -3,62 +3,22 @@
 #define glCheckError() glCheckError_(__FILE__, __LINE__)
 
 const std::string Utils::readShaderFile(const char* shaderFilePath){
-        std::ifstream shaderFile (shaderFilePath);
-        std::string outputString = "";
-        
-        if(shaderFile.is_open()){
-            std::string line = "";
-
-            while(std::getline(shaderFile, line)){
-                outputString += line + '\n';
-            }
-            
-            shaderFile.close(); 
+    std::ifstream shaderFile (shaderFilePath);
+    std::string outputString = "";
+    
+    if(shaderFile.is_open()){
+        std::string line = "";
+        while(std::getline(shaderFile, line)){
+            outputString += line + '\n';
         }
-         else 
-            std::cerr << "Error opening file: " << shaderFilePath << std::endl;
-    
+        
+        shaderFile.close(); 
+    }
+     else 
+        std::cerr << "Error opening file: " << shaderFilePath << std::endl;
 
-        return outputString;
-    };
-
-const GLuint Utils::createShaderProgram(const char* vertFile, const char* fragFile){
-    // 1) Write Shader Code and reference it
-    const std::string vertString = Utils::readShaderFile(vertFile);
-    const std::string fragString = Utils::readShaderFile(fragFile);
-
-    const GLchar* vertShaderSource = vertString.c_str();
-    const GLchar* fragShaderSource = fragString.c_str();
-
-    // 2) Create Shader Objects
-    GLuint vertexShader = glCreateShader(GL_VERTEX_SHADER);
-    GLuint fragShader = glCreateShader(GL_FRAGMENT_SHADER);
-
-    // 3) Load and Attach Shader Source Code
-    glShaderSource(vertexShader, 1, &vertShaderSource, NULL);
-    glShaderSource(fragShader, 1, &fragShaderSource, NULL);
-
-    // 4) Compile the shaders
-    glCompileShader(vertexShader);
-    glCompileShader(fragShader);
-
-    //IMPORTANT: Check for any shader errors
-    Utils::printShaderLog(vertexShader);
-    Utils::printShaderLog(fragShader);
-
-    // 5) Create the ShaderProgram
-    GLuint program = glCreateProgram();
-
-    // 6) Attach Shaders abd Link the Shader Program
-    glAttachShader(program, vertexShader);
-    glAttachShader(program, fragShader);
-    
-    //request to the GLSL compiler to ensure that the shaders are compatible  
-    glLinkProgram(program);
-    printProgramLog(program);
-
-    return program;
-}
+    return outputString;
+};
 
 const void Utils::printShaderLog(GLuint shader){
     int length = 0;
