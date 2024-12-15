@@ -7,6 +7,7 @@ class BufferManager{
         enum BufferType{
         Vertex,
         Texture,
+        Normal,
         Color
         };
 

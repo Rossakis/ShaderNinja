@@ -11,8 +11,8 @@ const void BufferManager::BindVertexArray(){
 }
 
 const void BufferManager::BindVertexBuffer(const float* vertices, size_t size, BufferType type){    
-    GLuint newBufferId;
-    m_VBOs.push_back(newBufferId);
+    // GLuint newBufferId;
+    // m_VBOs.push_back(newBufferId);
 
     glGenBuffers(1, &m_VBOs[m_buffer_index]);// assign the id to the buffer 
     glBindBuffer(GL_ARRAY_BUFFER, m_VBOs[m_buffer_index]);//make the new buffer active
@@ -21,23 +21,29 @@ const void BufferManager::BindVertexBuffer(const float* vertices, size_t size, B
     switch (type)
     {
         case BufferType::Vertex:
-            glVertexAttribPointer(m_buffer_index, 3, GL_FLOAT, GL_FALSE, 0, 0);
-            glEnableVertexAttribArray(m_buffer_index);
+            //glVertexAttribPointer(m_buffer_index, 3, GL_FLOAT, GL_FALSE, 0, 0);
+            //glEnableVertexAttribArray(m_buffer_index);
+            glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
             break;
-
         case BufferType::Texture:
-            glVertexAttribPointer(m_buffer_index, 2, GL_FLOAT, GL_FALSE, 0, 0);
-            glEnableVertexAttribArray(m_buffer_index);
+            //glVertexAttribPointer(m_buffer_index, 2, GL_FLOAT, GL_FALSE, 0, 0);
+            //glEnableVertexAttribArray(m_buffer_index);
+            glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
             break;
-
-        case BufferType::Color://TODO:
+        case BufferType::Normal:
+            glVertexAttribPointer(2, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            glEnableVertexAttribArray(2);
             break;
-
+        case BufferType::Color:
+            glVertexAttribPointer(3, 4, GL_FLOAT, GL_FALSE, 0, (void*)0);
+            glEnableVertexAttribArray(3);
+            break;
+    
         default:
             break;
     }
 
-    m_buffer_index++;
+    //m_buffer_index++;
 }
 
 const void BufferManager::UpdateVertexBuffer(){    
