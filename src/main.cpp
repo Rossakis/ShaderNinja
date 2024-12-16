@@ -41,7 +41,7 @@ void init(GLFWwindow* window) {
     timeManager = new TimeManager();
     inputManager = new InputManager(*window, *timeManager);
     camera = new Camera(*timeManager, *inputManager);
-    cubeTexture = new Texture("../resources/textures/Brick-Wall.jpg");
+    cubeTexture = new Texture("../../resources/textures/Brick-Wall.jpg");
 
     camera->SetPos(cameraStartPos);
     glfwGetFramebufferSize(window, &width, &height);
@@ -56,37 +56,29 @@ void init(GLFWwindow* window) {
     glDepthFunc(GL_LEQUAL);
 }
 
+void initVertexBuffers(void) {    
+    //TODO: make this work with Mesh->GetVerticesSize()
+    size_t vertexCount = sizeof(Primitive::CUBE_VERTICES) / sizeof(Primitive::CUBE_VERTICES[0]);
+    size_t textureCount = sizeof(Primitive::CUBE_TEXTURE_VERTICES) / sizeof(Primitive::CUBE_TEXTURE_VERTICES[0]); 
+
+    bufferManager->BindVertexBuffer(Primitive::CUBE_VERTICES, vertexCount, BufferManager::BufferType::Vertex);//layout = 0
+    bufferManager->BindVertexBuffer(Primitive::CUBE_TEXTURE_VERTICES, textureCount,  BufferManager::BufferType::Texture);//layout = 1
+}
+
 void initShaders()
 {
     shaderManager = new ShaderManager();
     vertexShader = new Shader(*shaderManager);
     fragmentShader = new Shader(*shaderManager);
 
-    vertexShader->CreateShader("../resources/shaders/vertexShader.glsl", Shader::ShaderType::Vertex);
-    fragmentShader->CreateShader("../resources/shaders/fragmentShader.glsl", Shader::ShaderType::Fragment);
+    vertexShader->CreateShader("../../resources/shaders/vertexShader.glsl", Shader::ShaderType::Vertex);
+    fragmentShader->CreateShader("../../resources/shaders/fragmentShader.glsl", Shader::ShaderType::Fragment);
 
     shaderManager->AddShader(vertexShader);
     shaderManager->AddShader(fragmentShader);
 
     shaderManager->LinkShaders();
-
-    // Set lighting parameters
-    GLuint programID = shaderManager->GetProgramId();
-    glUseProgram(programID);
-
-    glUniform3f(glGetUniformLocation(programID, "lightPos"), 5.0f, 5.0f, 5.0f);
-    glUniform3f(glGetUniformLocation(programID, "lightColor"), 1.0f, 1.0f, 1.0f);
-}
-
-void initVertexBuffers(void) {    
-    //TODO: make this work with Mesh->GetVerticesSize()
-    size_t vertexCount = sizeof(Primitive::CUBE_VERTICES) / sizeof(Primitive::CUBE_VERTICES[0]);
-    size_t textureCount = sizeof(Primitive::CUBE_TEXTURE_VERTICES) / sizeof(Primitive::CUBE_TEXTURE_VERTICES[0]); 
-    size_t normalsCount = sizeof(Primitive::CUBE_NORMALS) / sizeof(Primitive::CUBE_NORMALS[0]); 
-
-    bufferManager->BindVertexBuffer(Primitive::CUBE_VERTICES, vertexCount, BufferManager::BufferType::Vertex);//layout = 0
-    bufferManager->BindVertexBuffer(Primitive::CUBE_TEXTURE_VERTICES, textureCount,  BufferManager::BufferType::Texture);//layout = 1
-    bufferManager->BindVertexBuffer(Primitive::CUBE_NORMALS, normalsCount,  BufferManager::BufferType::Normal);//layout = 2
+    shaderManager->UseShaders();
 }
 
 void display(GLFWwindow* window, double currentTime) {
@@ -107,19 +99,14 @@ void applyMatrices(GLFWwindow* window, float currentTime){
     mMat = glm::rotate(mMat, camera->GetRot().x, glm::vec3(0.0f, 1.0f, 0.0f));//Y-axis
     mMat = glm::rotate(mMat, -camera->GetRot().y, glm::vec3(1.0f, 0.0f, 0.0f));//X-axis
     mvMat = vMat * mMat;
-
-    glm::mat3 normMat = glm::mat3(glm::transpose(glm::inverse(mMat))); // Normal matrix
-
+    
     //Load the program with our shaders to the GPU
     shaderManager->UseShaders();
     
     // send matrix data to the uniform variables
     glUniformMatrix4fv(glGetUniformLocation(shaderManager->GetProgramId(), "mvMat"), 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(glGetUniformLocation(shaderManager->GetProgramId(), "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
-
-    //New
-    glUniformMatrix3fv(glGetUniformLocation(shaderManager->GetProgramId(), "normMat"), 1, GL_FALSE, glm::value_ptr(normMat));
-    glUniform3fv(glGetUniformLocation(shaderManager->GetProgramId(), "viewPos"), 1, glm::value_ptr(camera->GetPos()));
+    glUniformMatrix4fv(glGetUniformLocation(shaderManager->GetProgramId(), "tc"), 1, GL_FALSE, glm::value_ptr(mvMat));
 }
 
 int main() {
