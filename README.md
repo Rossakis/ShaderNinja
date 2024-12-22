@@ -1,6 +1,6 @@
 # HOW TO INSTALL AND BUILD SHADER-NINJA
 
-### NOTE: Make sure you have at least C++ 20, and have installed CMake on your device beforehand at: 
+### NOTE: Make sure you have at least C++ 20, Mingw compiler (necessary) and have installed CMake on your device beforehand at: 
 https://cmake.org/download/
 <br/>
 
@@ -28,9 +28,9 @@ This will create your project's "build" directory within the current one, along 
 <br/>
 ### Step 3: Create the CMake build files
 ```
-cmake --build ./build
+cmake --build ./build -G "MinGW Makefiles"
 ```
-This will create the build files using the compiler available on your operating system (E.g., Ninja, Clang, GNU, etc.).
+This will create the build files using the MinGW compiler you've put into your System PATH.
 <br/>
 <br/>
 ### Step 4: The executable will now have been created in the "build" directory. Now, you can either:
