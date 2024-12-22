@@ -1,0 +1,13 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="17.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <CustomBuild Include="C:\Users\GiorgosDev\Documents\GitHub\ShaderNinja\CMakeFiles\23e3a7ad27fddf1d65b4a533ffb93dfd\INSTALL_force.rule">
+      <Filter>CMake Rules</Filter>
+    </CustomBuild>
+  </ItemGroup>
+  <ItemGroup>
+    <Filter Include="CMake Rules">
+      <UniqueIdentifier>{CB284E3C-C7D3-3DD7-BDCE-AE6E4A153DC9}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+</Project>

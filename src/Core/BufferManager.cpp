@@ -21,10 +21,12 @@ const void BufferManager::BindVertexBuffer(const float* vertices, size_t size, B
     switch (type)
     {
         case BufferType::Vertex:
+            // Match layout(location = 0)
             glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
             glEnableVertexAttribArray(0);
             break;
         case BufferType::Texture:
+            // Match layout(location = 1)
             glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
             glEnableVertexAttribArray(1);
             break;

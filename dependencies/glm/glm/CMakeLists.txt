@@ -61,6 +61,7 @@ if (GLM_BUILD_LIBRARY)
 		${SIMD_SOURCE}    ${SIMD_INLINE}    ${SIMD_HEADER}
 	)
 	add_library(glm::glm ALIAS glm)
+	target_include_directories(glm PUBLIC "${CMAKE_CURRENT_SOURCE_DIR}")
 	target_link_libraries(glm PUBLIC glm-header-only)
 else()
 	add_library(glm INTERFACE)

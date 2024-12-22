@@ -1,7 +1,7 @@
 #pragma once
 
 #include <TimeManager.h>
-#include <glm/glm.hpp>
+#include <CommonIncludes.h>
 
 class InputManager {
 public:

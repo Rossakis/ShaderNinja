@@ -58,6 +58,9 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/dependencies" 
 )
 
+
+# option(GLM_BUILD_LIBRARY "Build GLM as a static or shared library" ON)
+# set(GLM_BUILD_LIBRARY ON CACHE BOOL "Build GLM as a static or shared library" FORCE)#we want to build glm as a static libray, not header file
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui glm::glm-header-only soil2)
 
 # Add a custom target to build and run the project

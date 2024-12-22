@@ -106,7 +106,6 @@ void applyMatrices(GLFWwindow* window, float currentTime){
     // send matrix data to the uniform variables
     glUniformMatrix4fv(glGetUniformLocation(shaderManager->GetProgramId(), "mvMat"), 1, GL_FALSE, glm::value_ptr(mvMat));
     glUniformMatrix4fv(glGetUniformLocation(shaderManager->GetProgramId(), "projMat"), 1, GL_FALSE, glm::value_ptr(projMat));
-    glUniformMatrix4fv(glGetUniformLocation(shaderManager->GetProgramId(), "tc"), 1, GL_FALSE, glm::value_ptr(mvMat));
 }
 
 int main() {
