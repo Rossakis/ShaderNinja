@@ -48,13 +48,13 @@ if(MSVC)
 endif()
 
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
-    "${CMAKE_CURRENT_SOURCE_DIR}/include"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Core"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Game"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Graphics"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Physics"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Scene"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/include/Utilities"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Core"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Game"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Physics"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Scene"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Utilities"  
     "${CMAKE_CURRENT_SOURCE_DIR}/dependencies" 
 )
 
