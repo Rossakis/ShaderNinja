@@ -1,7 +1,7 @@
 cmake_minimum_required(VERSION 3.16)
 project(ShaderNinja)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 
 include(CheckIPOSupported)
 check_ipo_supported(RESULT ipo_supported OUTPUT error)
@@ -32,7 +32,9 @@ add_subdirectory(dependencies/SOIL2)
 file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS 
 "${CMAKE_CURRENT_SOURCE_DIR}/src/*.cpp")
 
-add_executable("${CMAKE_PROJECT_NAME}")
+add_executable("${CMAKE_PROJECT_NAME}"
+        src/Debug/ImguiManager.cpp
+        src/Debug/ImguiManager.h)
 
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC 
     GLFW_INCLUDE_NONE=1 
@@ -50,7 +52,8 @@ endif()
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"  
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Core"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Game"  
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Debug"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/Game"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics"  
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Physics"  
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Scene"  

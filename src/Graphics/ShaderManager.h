@@ -1,8 +1,8 @@
 #pragma once
 
 #include <CommonIncludes.h>
-#include <Utils.h>
-class Shader;//Forward Declaration, to avoid infinite loop of inclues between Shader and ShaderManager
+
+class Shader;//Forward Declaration, to avoid infinite loop of includes between Shader and ShaderManager
 
 ///Contains the ID of the shader program
 class ShaderManager{
@@ -12,10 +12,7 @@ class ShaderManager{
         void UseShaders();//Load the program with our shaders to the GPU
         void AddShader(Shader* shader);
         GLuint GetProgramId();
-
-        //Debug
-        void PrintAttachedShaders();
-
+        void PrintAttachedShaders();//Debug
     private:
         GLuint m_programID;
         std::vector<Shader*> m_shaders;

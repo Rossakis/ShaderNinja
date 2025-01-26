@@ -1,4 +1,5 @@
 #include <Shader.h>
+#include <Utils.h>
 
 Shader::Shader(ShaderManager& manager) : m_manager (manager) {
     m_shader_id = 0;

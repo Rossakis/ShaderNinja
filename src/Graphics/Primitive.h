@@ -1,8 +1,5 @@
 #pragma once
 
-#include <Texture.h>
-#include <array>
-
 class Primitive{
     public:
         Primitive();

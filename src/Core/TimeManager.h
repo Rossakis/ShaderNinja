@@ -7,7 +7,7 @@ public:
     TimeManager();
     ~TimeManager();
     void UpdateTime();
-    float GetDeltaTime() const; // const member function (const is declared after func name) means the class members won't be changed by this func
+    [[nodiscard]] float GetDeltaTime() const; // const member function (const is declared after func name) means the class members won't be changed by this func
     
 private:
     float m_lastTimeStamp;

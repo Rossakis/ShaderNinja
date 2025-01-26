@@ -1,7 +1,6 @@
 #pragma once
 
 #include <CommonIncludes.h>
-#include <Utils.h>
 #include <ShaderManager.h>
 
 class Shader{

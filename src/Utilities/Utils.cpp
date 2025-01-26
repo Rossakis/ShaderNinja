@@ -50,6 +50,7 @@ const void Utils::printProgramLog(int program){
     }
 }
 
+
 const GLenum Utils::checkOpenGLError(const char *file, int line)
 {
     GLenum errorCode;
