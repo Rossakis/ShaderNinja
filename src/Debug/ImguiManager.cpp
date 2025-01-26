@@ -2,7 +2,11 @@
 #include "ImguiManager.h"
 
 ImguiManager::ImguiManager(TimeManager &time) : m_timeManager(time){
-    //m_messageEnabled = true;
+    m_objFileDialog.SetTitle(".OBJ file Search");
+    m_objFileDialog.SetTypeFilters({ ".obj" });
+
+    m_textureFileDialog.SetTitle(".PNG/.JPG file Search");
+    m_textureFileDialog.SetTypeFilters({ ".jpg", ".png" });
 }
 
 void ImguiManager::printMessage(bool &messageEnabled, float duration, const char *message) {
@@ -22,4 +26,34 @@ void ImguiManager::printMessage(bool &messageEnabled, float duration, const char
         }
     }
 }
+
+void ImguiManager::Update() {
+    m_objFileDialog.Display();
+    m_textureFileDialog.Display();
+
+    if(m_objFileDialog.HasSelected())
+    {
+        std::cout << "Selected filename" << m_objFileDialog.GetSelected().string() << std::endl;
+        m_objFileDialog.ClearSelected();
+        return;
+    }
+
+    if(m_textureFileDialog.HasSelected())
+    {
+        std::cout << "Selected filename" << m_textureFileDialog.GetSelected().string() << std::endl;
+        m_textureFileDialog.ClearSelected();
+        return;
+    }
+}
+
+const char *ImguiManager::OpenFileBrowser(FileBrowserType fileType) {
+    if (fileType == OBJ) {
+        m_objFileDialog.Open();
+    }
+    else if (fileType == OBJ) {
+        m_textureFileDialog.Open();
+    }
+}
+
+
 

@@ -13,6 +13,7 @@
 #include <imgui.h>
 #include <backends/imgui_impl_glfw.h>
 #include <backends/imgui_impl_opengl3.h>
+#include <imfilebrowser.h>
 
 //Funcs
 void init3DModelVertexBuffers();
@@ -55,7 +56,10 @@ void init(GLFWwindow* window) {
     inputManager = new InputManager(*window, *timeManager);
     imguiManager = new ImguiManager(*timeManager);
     camera = new Camera(*timeManager, *inputManager);
-    cubeTexture = new Texture("../../resources/textures/WallTexture.png");
+
+    std::string texturePath = "./resources/textures/WallTexture.png";
+    std::cout << "Absolute path: " << std::filesystem::absolute(texturePath) << std::endl;
+    cubeTexture = new Texture(std::filesystem::absolute(texturePath).string().c_str());
 
     camera->SetPos(cameraStartPos);
     glfwGetFramebufferSize(window, &width, &height);
@@ -68,13 +72,10 @@ void init(GLFWwindow* window) {
     glEnable(GL_DEPTH_TEST);//enable depth testing
     glDepthFunc(GL_LEQUAL);
 
-    //init3DModelVertexBuffers();
     initShaders();
 }
 
 void init3DModelVertexBuffers() {
-    // std::cout << "Initializing 3D model vertex buffers..." << std::endl;
-
     //TODO: make this work with Mesh->GetVerticesSize()
     size_t vertexCount = sizeof(Primitive::CUBE_VERTICES) / sizeof(Primitive::CUBE_VERTICES[0]);
     size_t textureCount = sizeof(Primitive::CUBE_TEXTURE_VERTICES) / sizeof(Primitive::CUBE_TEXTURE_VERTICES[0]); 
@@ -106,26 +107,36 @@ void display(GLFWwindow* window, double currentTime) {
 
     imguiLoadWidget();
     applyMatrices(window, (float)currentTime);    
-    glDrawArrays(GL_TRIANGLES, 0, 36); 
-
-    if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
-        glfwSetWindowShouldClose(window, true);
+    glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //TODO: implement this with event system
     Utils::checkOpenGLError(__FILE__, __LINE__);
 }
 
+bool showLoadObjMessage = false;
+bool showTextureMessage = false;
 void imguiLoadWidget() {
     // Load Model Obj
     ImGui::Begin("Options");
+
+    //Load new OBJ model
     if (ImGui::Button("Load OBJ Model")) {
         init3DModelVertexBuffers();
-        showMessage = true; // Enable the popup
+        showLoadObjMessage = true; // Enable the popup
     }
-    imguiManager->printMessage(showMessage, imguiMessageDuration, "Button Pressed Successfully!");
-    
-    //TODO: Add texture loading
-    //char[] pathToTexture;
+    imguiManager->printMessage(showLoadObjMessage, imguiMessageDuration, "Successfully added OBJ model!");
+
+    //Change current model's texture
+    if (ImGui::Button("Change Model Texture")) {
+        imguiManager->OpenFileBrowser(FileBrowserType::TEXTURE);
+        cubeTexture = new Texture("../../resources/textures/Brick-Wall.jpg");
+        showTextureMessage = true; // Enable the popup
+    }
+    imguiManager->printMessage(showTextureMessage, imguiMessageDuration, "Successfully changed model's texture!");
+
+    if (ImGui::Button("Reset Camera Pos")) {
+        camera->SetPos(cameraStartPos);
+    }
     ImGui::End();
 }
 
@@ -145,7 +156,6 @@ void applyMatrices(GLFWwindow* window, float currentTime){
 }
 
 int main() {
-    //Initialize the GLFW library
     if (!glfwInit()) {
         exit(EXIT_FAILURE);
     }
@@ -186,6 +196,8 @@ int main() {
     //Update Loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();//poll event for input (mouse, keyboard, joystick, etc...)
+        if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
+            glfwSetWindowShouldClose(window, true);
 
         // Start ImGui frame
         ImGui_ImplOpenGL3_NewFrame();
@@ -197,6 +209,7 @@ int main() {
         timeManager->UpdateTime();
         inputManager->UpdateInput();
         camera->Update();
+        imguiManager->Update();
 
         // Render ImGui
         ImGui::Render();

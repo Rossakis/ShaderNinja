@@ -70,6 +70,23 @@ target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui glm::glm-h
 add_custom_target(run
     COMMAND $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
     DEPENDS "${CMAKE_PROJECT_NAME}"
-    WORKING_DIRECTORY ${CMAKE_CURRENT_BINARY_DIR}
+    WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 add_dependencies(run "${CMAKE_PROJECT_NAME}")
+
+#set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+
+
+#target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC
+#        RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/"
+#)
+## Define the source and destination for the resources folder
+set(SOURCE_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+set(DEST_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
+#
+## Copy the resources folder to the release directory after build
+add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
+        COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${SOURCE_RESOURCES_DIR}"  # Source resources directory
+        "${DEST_RESOURCES_DIR}"    # Destination release/resources
+)
