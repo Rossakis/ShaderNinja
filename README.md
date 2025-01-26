@@ -1,6 +1,6 @@
 # HOW TO INSTALL AND BUILD SHADER-NINJA
 
-### NOTE: Make sure you have at least C++ 20, Mingw compiler (necessary) and have installed CMake on your device beforehand at: 
+### NOTE: Make sure you have at least C++ 20, Mingw compiler version 11.0 and newer (necessary), and have installed CMake on your device beforehand at: 
 https://cmake.org/download/
 <br/>
 
