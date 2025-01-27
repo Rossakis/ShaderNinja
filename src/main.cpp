@@ -11,9 +11,6 @@
 #include <ImguiManager.h>
 
 #include <imgui.h>
-#include <backends/imgui_impl_glfw.h>
-#include <backends/imgui_impl_opengl3.h>
-#include <imfilebrowser.h>
 
 //Funcs
 void init3DModelVertexBuffers();
@@ -51,15 +48,12 @@ TimeManager* timeManager = nullptr;
 ImguiManager* imguiManager = nullptr;
 
 void init(GLFWwindow* window) {
-    bufferManager = new BufferManager();
     timeManager = new TimeManager();
+    bufferManager = new BufferManager();
+    imguiManager = new ImguiManager(*window, *timeManager);
     inputManager = new InputManager(*window, *timeManager);
-    imguiManager = new ImguiManager(*timeManager);
     camera = new Camera(*timeManager, *inputManager);
-
-    std::string texturePath = "./resources/textures/WallTexture.png";
-    std::cout << "Absolute path: " << std::filesystem::absolute(texturePath) << std::endl;
-    cubeTexture = new Texture(std::filesystem::absolute(texturePath).string().c_str());
+    cubeTexture = new Texture("../../resources/textures/WallTexture.png");
 
     camera->SetPos(cameraStartPos);
     glfwGetFramebufferSize(window, &width, &height);
@@ -127,12 +121,18 @@ void imguiLoadWidget() {
     imguiManager->printMessage(showLoadObjMessage, imguiMessageDuration, "Successfully added OBJ model!");
 
     //Change current model's texture
-    if (ImGui::Button("Change Model Texture")) {
-        imguiManager->OpenFileBrowser(FileBrowserType::TEXTURE);
-        cubeTexture = new Texture("../../resources/textures/Brick-Wall.jpg");
+    if (ImGui::Button("Change Texture")) {
+        imguiManager->OpenFileDialog(TEXTURE);
         showTextureMessage = true; // Enable the popup
     }
-    imguiManager->printMessage(showTextureMessage, imguiMessageDuration, "Successfully changed model's texture!");
+
+    // if (showTextureMessage) {
+    //     if (imguiManager->GetOpenFileName(TEXTURE) != nullptr) {
+    //         cubeTexture = new Texture(imguiManager->GetOpenFileName(TEXTURE));
+    //         showTextureMessage = false;
+    //     }
+    // }
+    //imguiManager->printMessage(showTextureMessage, imguiMessageDuration, "Successfully changed model's texture!");
 
     if (ImGui::Button("Reset Camera Pos")) {
         camera->SetPos(cameraStartPos);
@@ -182,45 +182,26 @@ int main() {
     //Start
     init(window);
 
-    // Initialize ImGui
-    IMGUI_CHECKVERSION();
-    ImGui::CreateContext();
-    ImGuiIO& io = ImGui::GetIO(); (void)io;
-    io.FontGlobalScale = 1.5f;
-    ImGui::StyleColorsDark();
-
-    // Initialize imgui backends
-    ImGui_ImplGlfw_InitForOpenGL(window, true);// Platform backend
-    ImGui_ImplOpenGL3_Init("#version 410");// Renderer backend
-
     //Update Loop
     while (!glfwWindowShouldClose(window)) {
         glfwPollEvents();//poll event for input (mouse, keyboard, joystick, etc...)
         if(glfwGetKey(window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
             glfwSetWindowShouldClose(window, true);
 
-        // Start ImGui frame
-        ImGui_ImplOpenGL3_NewFrame();
-        ImGui_ImplGlfw_NewFrame();
-        ImGui::NewFrame();
+        imguiManager->UpdateFrame();//should be called before 3D rendering below
 
-        //3D Scene
         display(window, glfwGetTime());
         timeManager->UpdateTime();
         inputManager->UpdateInput();
         camera->Update();
-        imguiManager->Update();
 
-        // Render ImGui
-        ImGui::Render();
-        ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
+        imguiManager->UpdateFileDialog();
+        imguiManager->Render();
 
         glfwSwapBuffers(window);//GLFW windows are double-buffered (meaning there are two color buffers)
     }
 
-    ImGui_ImplOpenGL3_Shutdown();
-    ImGui_ImplGlfw_Shutdown();
-    ImGui::DestroyContext();
+    imguiManager->Exit();
 
     glfwDestroyWindow(window);
     glfwTerminate();

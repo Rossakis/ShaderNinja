@@ -10,7 +10,7 @@ class Texture{
         ~Texture();
 
         GLuint GetTextureId();
-        const GLuint LoadTexture(const char* textureImagePath);
+        void LoadTexture(const char* textureImagePath);
         
     private:
         GLuint _textureID;
