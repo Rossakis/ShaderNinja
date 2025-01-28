@@ -22,7 +22,7 @@ class ImguiManager {
         void Exit();
         void printMessage(bool &messageEnabled, float duration, const char *message);
         void OpenFileDialog(DialogFileType fileType);
-        const char* GetOpenFileName(DialogFileType fileType);
+        ImGui::FileBrowser* GetFileDialog(DialogFileType fileType);
     private:
         GLFWwindow& m_window;
         TimeManager& m_timeManager;

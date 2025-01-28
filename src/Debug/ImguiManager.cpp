@@ -67,19 +67,6 @@ void ImguiManager::printMessage(bool &messageEnabled, float duration, const char
 void ImguiManager::UpdateFileDialog() {
     m_objFileDialog.Display();
     m_textureFileDialog.Display();
-
-    if(m_objFileDialog.HasSelected())
-    {
-        std::cout << "Selected filename" << m_objFileDialog.GetSelected().string() << std::endl;
-        m_objFileDialog.ClearSelected();
-        return;
-    }
-
-    if(m_textureFileDialog.HasSelected())
-    {
-        std::cout << "Selected filename" << m_textureFileDialog.GetSelected().string() << std::endl;
-        m_textureFileDialog.ClearSelected();
-    }
 }
 
 void ImguiManager::OpenFileDialog(DialogFileType fileType) {
@@ -91,21 +78,15 @@ void ImguiManager::OpenFileDialog(DialogFileType fileType) {
     }
 }
 
-const char *ImguiManager::GetOpenFileName(DialogFileType fileType) {
-    if (fileType == OBJ) {
-        if (m_objFileDialog.IsOpened() && m_objFileDialog.HasSelected()) {
-            return m_objFileDialog.GetSelected().string().c_str();
-        }
+ImGui::FileBrowser* ImguiManager::GetFileDialog(DialogFileType fileType) {
+    switch (fileType) {
+        case OBJ:
+            return &m_objFileDialog;
+        case TEXTURE:
+            return &m_textureFileDialog;
+        default:
+            throw std::invalid_argument( "Invalid fileType" );
     }
-    else if (fileType == TEXTURE) {
-        if (m_textureFileDialog.IsOpened() && m_textureFileDialog.HasSelected()) {
-            return m_textureFileDialog.GetSelected().string().c_str();
-        }
-    }
-    else
-        return nullptr;
-
-    //m_textureFileDialog.
 }
 
 

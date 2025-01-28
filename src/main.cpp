@@ -53,7 +53,7 @@ void init(GLFWwindow* window) {
     imguiManager = new ImguiManager(*window, *timeManager);
     inputManager = new InputManager(*window, *timeManager);
     camera = new Camera(*timeManager, *inputManager);
-    cubeTexture = new Texture("../../resources/textures/WallTexture.png");
+    cubeTexture = new Texture("../../resources/textures/Brick-Wall.jpg");
 
     camera->SetPos(cameraStartPos);
     glfwGetFramebufferSize(window, &width, &height);
@@ -100,7 +100,7 @@ void display(GLFWwindow* window, double currentTime) {
     glClear(GL_COLOR_BUFFER_BIT);
 
     imguiLoadWidget();
-    applyMatrices(window, (float)currentTime);    
+    applyMatrices(window, (float)currentTime);
     glDrawArrays(GL_TRIANGLES, 0, 36);
 
     //TODO: implement this with event system
@@ -109,8 +109,9 @@ void display(GLFWwindow* window, double currentTime) {
 
 bool showLoadObjMessage = false;
 bool showTextureMessage = false;
+bool tiktok = false;
+
 void imguiLoadWidget() {
-    // Load Model Obj
     ImGui::Begin("Options");
 
     //Load new OBJ model
@@ -120,20 +121,19 @@ void imguiLoadWidget() {
     }
     imguiManager->printMessage(showLoadObjMessage, imguiMessageDuration, "Successfully added OBJ model!");
 
-    //Change current model's texture
+    //Change Texture
     if (ImGui::Button("Change Texture")) {
         imguiManager->OpenFileDialog(TEXTURE);
-        showTextureMessage = true; // Enable the popup
     }
 
-    // if (showTextureMessage) {
-    //     if (imguiManager->GetOpenFileName(TEXTURE) != nullptr) {
-    //         cubeTexture = new Texture(imguiManager->GetOpenFileName(TEXTURE));
-    //         showTextureMessage = false;
-    //     }
-    // }
-    //imguiManager->printMessage(showTextureMessage, imguiMessageDuration, "Successfully changed model's texture!");
+    if (imguiManager->GetFileDialog(TEXTURE)->HasSelected()) {
+        cubeTexture->LoadTexture(imguiManager->GetFileDialog(TEXTURE)->GetSelected().string().c_str());
+        imguiManager->GetFileDialog(TEXTURE)->ClearSelected();
+        showTextureMessage = true;
+    }
+    imguiManager->printMessage(showTextureMessage, imguiMessageDuration, ("Successfully changed texture to: \n " + imguiManager->GetFileDialog(TEXTURE)->GetSelected().string()).c_str());
 
+    //Reset Camera Position
     if (ImGui::Button("Reset Camera Pos")) {
         camera->SetPos(cameraStartPos);
     }

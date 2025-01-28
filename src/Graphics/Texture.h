@@ -8,10 +8,8 @@ class Texture{
         Texture(const char* stringPath);
         Texture(const char* stringPath, float width, float height);
         ~Texture();
-
-        GLuint GetTextureId();
         void LoadTexture(const char* textureImagePath);
-        
+        GLuint GetTextureId();
     private:
         GLuint _textureID;
         float _width;
