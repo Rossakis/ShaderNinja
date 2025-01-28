@@ -9,21 +9,18 @@
 #include <BufferManager.h> 
 #include <Shader.h>
 #include <ImguiManager.h>
-
-#include <imgui.h>
-
-#include "OBJModelImporter.h"
+#include <OBJModelImporter.h>
 
 //Funcs
-void init3DModelVertexBuffers();
 void applyMatrices(GLFWwindow* window, float currentTime);
 void initShaders();
-void imguiLoadWidget();
+void imguiOptionsWidget();
+void imguiEditModeLabel();
 void imguiShowMessage(float time, const char* message);
 void setupObjVertices();
 
 //Const values
-const glm::vec3 cubePos = glm::vec3(0.0f, -2.0f, 0.0f);
+const glm::vec3 modelPos = glm::vec3(0.0f, -2.0f, 0.0f);
 const glm::vec3 cameraStartPos = glm::vec3(0.0f, -2.0f, 7.5f);
 
 //Vars
@@ -35,17 +32,24 @@ float cameraBonusSpeed;
 int width, height;
 float imguiMessageDuration = 2.0f;
 float imguiMessageTimer = 0.0f;
+bool isInPauseMode = false;
 
 //Custom objects
 ShaderManager* shaderManager = nullptr;
 Shader* vertexShader = nullptr;
 Shader* fragmentShader = nullptr; 
 BufferManager* bufferManager = nullptr;
-Texture* cubeTexture = nullptr;
+Texture* modelTexture = nullptr;
 Camera* camera = nullptr;
 InputManager* inputManager = nullptr;
 TimeManager* timeManager = nullptr;
 ImguiManager* imguiManager = nullptr;
+
+#define numVAOs 1
+#define numVBOs 2 //vertices + textures
+GLuint vao[numVAOs];
+GLuint vbo[numVBOs];
+int numVertices;
 
 void init(GLFWwindow* window) {
     timeManager = new TimeManager();
@@ -53,7 +57,7 @@ void init(GLFWwindow* window) {
     imguiManager = new ImguiManager(*window, *timeManager);
     inputManager = new InputManager(*window, *timeManager);
     camera = new Camera(*timeManager, *inputManager);
-    cubeTexture = new Texture("../../resources/textures/Brick-Wall.jpg");
+    modelTexture = new Texture("../../resources/textures/PlaceholderTexture.png");
 
     camera->SetPos(cameraStartPos);
     glfwGetFramebufferSize(window, &width, &height);
@@ -67,22 +71,6 @@ void init(GLFWwindow* window) {
     initShaders();
 }
 
-void init3DModelVertexBuffers() {
-    //TODO: make this work with Mesh->GetVerticesSize()
-    size_t vertexCount = sizeof(Primitive::CUBE_VERTICES) / sizeof(Primitive::CUBE_VERTICES[0]);
-    size_t textureCount = sizeof(Primitive::CUBE_TEXTURE_VERTICES) / sizeof(Primitive::CUBE_TEXTURE_VERTICES[0]); 
-
-    bufferManager->BindVertexBuffer(Primitive::CUBE_VERTICES, vertexCount, BufferManager::BufferType::Vertex);//layout = 0
-    bufferManager->BindVertexBuffer(Primitive::CUBE_TEXTURE_VERTICES, textureCount,  BufferManager::BufferType::Texture);//layout = 1
-}
-
-
-#define numVAOs 1
-#define numVBOs 2  //changed from 2 to 3
-GLuint vao[numVAOs];
-GLuint vbo[numVBOs];
-int numVertices;
-
 void setupObjVertices(std::string modelPath) {
     OBJModelImporter model;
     model.parseObjFile(modelPath.c_str());
@@ -91,12 +79,8 @@ void setupObjVertices(std::string modelPath) {
     std::vector<float> modelVertices = model.getVertices();
     auto modelTexCoords = model.getTexCoords();
 
-    std::cout << "Number of vertices: " << numVertices<< std::endl;
-    std::cout << "Number of textures: " << model.getTexCoords().size() << std::endl;
-
     glGenVertexArrays(numVAOs, vao);
     glBindVertexArray(vao[0]);
-
     glGenBuffers(numVBOs, vbo);
 
     //Vertices
@@ -134,7 +118,8 @@ void display(GLFWwindow* window, double currentTime) {
     glClear(GL_DEPTH_BUFFER_BIT);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    imguiLoadWidget();
+    imguiOptionsWidget();
+    imguiEditModeLabel();
     applyMatrices(window, (float)currentTime);
 
     glDrawArrays(GL_TRIANGLES, 0, numVertices);
@@ -148,12 +133,12 @@ bool showLoadObjMessage = false;
 bool showTextureMessage = false;
 bool tiktok = false;
 
-void imguiLoadWidget() {
+void imguiOptionsWidget() {
     ImGui::Begin("Options");
 
     //Load Primitive
     if (ImGui::Button("Load Default Cube")) {
-        init3DModelVertexBuffers();
+        Primitive::CreatePrimitiveCube(bufferManager);
     }
 
     //Load new OBJ model
@@ -173,7 +158,7 @@ void imguiLoadWidget() {
     }
 
     if (imguiManager->GetFileDialog(TEXTURE)->HasSelected()) {
-        cubeTexture->LoadTexture(imguiManager->GetFileDialog(TEXTURE)->GetSelected().string().c_str());
+        modelTexture->LoadTexture(imguiManager->GetFileDialog(TEXTURE)->GetSelected().string().c_str());
         imguiManager->GetFileDialog(TEXTURE)->ClearSelected();
         showTextureMessage = true;
     }
@@ -183,16 +168,37 @@ void imguiLoadWidget() {
     if (ImGui::Button("Reset Camera Pos")) {
         camera->SetPos(cameraStartPos);
     }
+
+    ImGui::End();
+}
+
+void imguiEditModeLabel() {
+    ImGui::SetNextWindowPos(ImVec2(width / 2.0f, 20.0f), ImGuiCond_Always, ImVec2(0.5f, 0.0f));
+    ImGui::SetNextWindowSize(ImVec2(350, 50)); // Adjust size if needed
+
+    // Create a transparent, non-interactive window
+    ImGui::Begin("PlayMode Indicator", nullptr,
+                 ImGuiWindowFlags_NoDecoration | ImGuiWindowFlags_AlwaysAutoResize |
+                 ImGuiWindowFlags_NoBackground | ImGuiWindowFlags_NoMove |
+                 ImGuiWindowFlags_NoInputs);
+
+    // Set text color
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Mode: %s", isInPauseMode ? "PauseMode" : "FreeMovementMode");
+
     ImGui::End();
 }
 
 void applyMatrices(GLFWwindow* window, float currentTime){    
     vMat = glm::translate(glm::mat4(1.0f), glm::vec3(-camera->GetPos().x, -camera->GetPos().y, -camera->GetPos().z));
-    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(cubePos.x, cubePos.y, cubePos.z));
-    mMat = glm::rotate(mMat, camera->GetRot().x, glm::vec3(0.0f, 1.0f, 0.0f));
-    mMat = glm::rotate(mMat, -camera->GetRot().y, glm::vec3(1.0f, 0.0f, 0.0f));
+    mMat = glm::translate(glm::mat4(1.0f), glm::vec3(modelPos.x, modelPos.y, modelPos.z));
+
+    if (!isInPauseMode) {
+        mMat = glm::rotate(mMat, camera->GetRot().x, glm::vec3(0.0f, 1.0f, 0.0f));
+        mMat = glm::rotate(mMat, -camera->GetRot().y, glm::vec3(1.0f, 0.0f, 0.0f));
+    }
+
     mvMat = vMat * mMat;
-    
+
     //Load the program with our shaders to the GPU
     shaderManager->UseShaders();
     
@@ -243,6 +249,10 @@ int main() {
 
         imguiManager->UpdateFileDialog();
         imguiManager->Render();
+
+        if (inputManager->PausePressed()) {
+            isInPauseMode = !isInPauseMode;
+        }
 
         glfwSwapBuffers(window);//GLFW windows are double-buffered (meaning there are two color buffers)
     }

@@ -19,8 +19,10 @@ public:
     bool ForwardPressed();
     bool BackwardsPressed();
     bool SpeedUpPressed();
+    bool PausePressed();
 
 private:
+    bool pressedEdit;
     GLFWwindow& m_window;
     TimeManager& m_time;
     double m_lastPosX;

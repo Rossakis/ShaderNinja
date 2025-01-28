@@ -1,3 +1,4 @@
+#include <BufferManager.h>
 #include <Primitive.h>
 
 Primitive::Primitive(){
@@ -167,3 +168,11 @@ const float Primitive::PYRAMID_TEXTURE_VERTICES[36] = {
     0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f, 
     0.0f, 0.0f, 1.0f, 0.0f, 0.5f, 1.0f  
 };
+
+const void Primitive::CreatePrimitiveCube(BufferManager* bufferManager) {
+ size_t vertexCount = sizeof(Primitive::CUBE_VERTICES) / sizeof(Primitive::CUBE_VERTICES[0]);
+ size_t textureCount = sizeof(Primitive::CUBE_TEXTURE_VERTICES) / sizeof(Primitive::CUBE_TEXTURE_VERTICES[0]);
+
+ bufferManager->BindVertexBuffer(Primitive::CUBE_VERTICES, vertexCount, BufferManager::BufferType::Vertex);//layout = 0
+ bufferManager->BindVertexBuffer(Primitive::CUBE_TEXTURE_VERTICES, textureCount,  BufferManager::BufferType::Texture);//layout = 1
+}

@@ -1,5 +1,7 @@
 #pragma once
 
+#include <BufferManager.h>
+
 class Primitive{
     public:
         Primitive();
@@ -12,5 +14,7 @@ class Primitive{
         static const float PYRAMID_VERTICES[54];
         static const float PYRAMID_NORMALS[54];
         static const float PYRAMID_TEXTURE_VERTICES[36];
+
+        static const void CreatePrimitiveCube(BufferManager* bufferManager);
 };
 

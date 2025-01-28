@@ -78,3 +78,15 @@ bool InputManager::SpeedUpPressed(){
     }
     return false;
 }
+
+bool InputManager::PausePressed() {
+    if (glfwGetKey(&m_window, GLFW_KEY_F1) == GLFW_PRESS) {
+        if (!pressedEdit) {
+            pressedEdit = true;
+            return true;
+        }
+    } else {
+        pressedEdit = false; // Reset state when key is released
+    }
+    return false;
+}
