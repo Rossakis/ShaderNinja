@@ -4,7 +4,7 @@ layout (location = 0) in vec3 position; // Vertex position
 layout (location = 1) in vec2 texCoord; // Vertex texture coordinates
 layout (location = 2) in vec3 normal;   // Vertex normal (if needed for lighting calculations)
 
-layout (binding = 0) uniform sampler2D samp; // Texture sampler (not used in vertex shader)
+//layout (binding = 0) uniform sampler2D samp; // Texture sampler (not used in vertex shader)
 
 out vec2 tc; // Texture coordinate passed to the fragment shader
 

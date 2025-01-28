@@ -29,7 +29,6 @@ void ImguiManager::SetFileDialogParameters() {
 }
 
 void ImguiManager::UpdateFrame() {
-    // Start ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();

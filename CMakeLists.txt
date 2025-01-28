@@ -34,7 +34,9 @@ file(GLOB_RECURSE SOURCE_FILES CONFIGURE_DEPENDS
 
 add_executable("${CMAKE_PROJECT_NAME}"
         src/Debug/ImguiManager.cpp
-        src/Debug/ImguiManager.h)
+        src/Debug/ImguiManager.h
+        src/Graphics/OBJModelImporter.cpp
+        src/Graphics/OBJModelImporter.h)
 
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC 
     GLFW_INCLUDE_NONE=1 
@@ -74,17 +76,11 @@ add_custom_target(run
 )
 add_dependencies(run "${CMAKE_PROJECT_NAME}")
 
-#set_property(TARGET ${CMAKE_PROJECT_NAME} PROPERTY VS_DEBUGGER_WORKING_DIRECTORY "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-
-
-#target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC
-#        RESOURCES_PATH="${CMAKE_CURRENT_SOURCE_DIR}/resources/"
-#)
-## Define the source and destination for the resources folder
+# Define the source and destination for the resources folder
 set(SOURCE_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
 set(DEST_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
-#
-## Copy the resources folder to the release directory after build
+
+# Copy the resources folder to the release directory after build
 add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
         COMMAND ${CMAKE_COMMAND} -E copy_directory
         "${SOURCE_RESOURCES_DIR}"  # Source resources directory

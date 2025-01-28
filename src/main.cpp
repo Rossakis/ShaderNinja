@@ -12,12 +12,15 @@
 
 #include <imgui.h>
 
+#include "OBJModelImporter.h"
+
 //Funcs
 void init3DModelVertexBuffers();
 void applyMatrices(GLFWwindow* window, float currentTime);
 void initShaders();
 void imguiLoadWidget();
 void imguiShowMessage(float time, const char* message);
+void setupObjVertices();
 
 //Const values
 const glm::vec3 cubePos = glm::vec3(0.0f, -2.0f, 0.0f);
@@ -30,9 +33,6 @@ float cameraInputX, cameraInputY;
 float aspect;
 float cameraBonusSpeed;
 int width, height;
-bool createdModel;
-
-bool showMessage;
 float imguiMessageDuration = 2.0f;
 float imguiMessageTimer = 0.0f;
 
@@ -59,8 +59,6 @@ void init(GLFWwindow* window) {
     glfwGetFramebufferSize(window, &width, &height);
     aspect = (float)width / (float)height;
     projMat = glm::perspective(glm::radians(60.0f), aspect, 0.1f, 1000.0f);
-    createdModel = false;
-    showMessage = false;
 
     //adjust Opengl settings and draw model
     glEnable(GL_DEPTH_TEST);//enable depth testing
@@ -77,6 +75,43 @@ void init3DModelVertexBuffers() {
     bufferManager->BindVertexBuffer(Primitive::CUBE_VERTICES, vertexCount, BufferManager::BufferType::Vertex);//layout = 0
     bufferManager->BindVertexBuffer(Primitive::CUBE_TEXTURE_VERTICES, textureCount,  BufferManager::BufferType::Texture);//layout = 1
 }
+
+
+#define numVAOs 1
+#define numVBOs 2  //changed from 2 to 3
+GLuint vao[numVAOs];
+GLuint vbo[numVBOs];
+int numVertices;
+
+void setupObjVertices(std::string modelPath) {
+    OBJModelImporter model;
+    model.parseObjFile(modelPath.c_str());
+    numVertices = model.getNumVertices();
+
+    std::vector<float> modelVertices = model.getVertices();
+    auto modelTexCoords = model.getTexCoords();
+
+    std::cout << "Number of vertices: " << numVertices<< std::endl;
+    std::cout << "Number of textures: " << model.getTexCoords().size() << std::endl;
+
+    glGenVertexArrays(numVAOs, vao);
+    glBindVertexArray(vao[0]);
+
+    glGenBuffers(numVBOs, vbo);
+
+    //Vertices
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[0]);
+    glBufferData(GL_ARRAY_BUFFER, modelVertices.size() * sizeof(float), &modelVertices[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(0, 3, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(0);
+
+    // Textures
+    glBindBuffer(GL_ARRAY_BUFFER, vbo[1]);
+    glBufferData(GL_ARRAY_BUFFER, modelTexCoords.size() * sizeof(float), &modelTexCoords[0], GL_STATIC_DRAW);
+    glVertexAttribPointer(1, 2, GL_FLOAT, GL_FALSE, 0, (void*)0);
+    glEnableVertexAttribArray(1);
+}
+
 
 void initShaders()
 {
@@ -101,12 +136,14 @@ void display(GLFWwindow* window, double currentTime) {
 
     imguiLoadWidget();
     applyMatrices(window, (float)currentTime);
-    glDrawArrays(GL_TRIANGLES, 0, 36);
+
+    glDrawArrays(GL_TRIANGLES, 0, numVertices);
 
     //TODO: implement this with event system
     Utils::checkOpenGLError(__FILE__, __LINE__);
 }
 
+bool showLoadPrimitiveMessage = false;
 bool showLoadObjMessage = false;
 bool showTextureMessage = false;
 bool tiktok = false;
@@ -114,12 +151,21 @@ bool tiktok = false;
 void imguiLoadWidget() {
     ImGui::Begin("Options");
 
+    //Load Primitive
+    if (ImGui::Button("Load Default Cube")) {
+        init3DModelVertexBuffers();
+    }
+
     //Load new OBJ model
     if (ImGui::Button("Load OBJ Model")) {
-        init3DModelVertexBuffers();
-        showLoadObjMessage = true; // Enable the popup
+        imguiManager->OpenFileDialog(OBJ);
     }
-    imguiManager->printMessage(showLoadObjMessage, imguiMessageDuration, "Successfully added OBJ model!");
+    if (imguiManager->GetFileDialog(OBJ)->HasSelected()) {
+        setupObjVertices(imguiManager->GetFileDialog(OBJ)->GetSelected().string());
+        imguiManager->GetFileDialog(OBJ)->ClearSelected();
+        showLoadObjMessage = true;
+    }
+    imguiManager->printMessage(showLoadObjMessage, imguiMessageDuration, ("Successfully added: \n " + imguiManager->GetFileDialog(OBJ)->GetSelected().string()).c_str());
 
     //Change Texture
     if (ImGui::Button("Change Texture")) {

@@ -16,6 +16,9 @@ class BufferManager{
         const void BindVertexArray();
         const void BindVertexBuffer(const float* vertices, size_t size, BufferType type);
         const void UpdateVertexBuffer();
+        GLuint* GetVAO();
+        GLuint GetNumOfVBOs();
+        std::vector<GLuint> GetVBOs();
 
     private:
         GLuint m_buffer_index;

@@ -46,5 +46,18 @@ const void BufferManager::BindVertexBuffer(const float* vertices, size_t size, B
     m_buffer_index++;
 }
 
+GLuint* BufferManager::GetVAO() {
+    return &m_VAOs[0];
+}
+
+GLuint BufferManager::GetNumOfVBOs() {
+    return m_num_VBOs;
+}
+
+std::vector<GLuint> BufferManager::GetVBOs() {
+    return m_VBOs;
+}
+
+
 const void BufferManager::UpdateVertexBuffer(){    
 }
