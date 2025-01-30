@@ -18,9 +18,9 @@ cd C:\Users\MyName\Documents\ShaderNinja
 ```
 <br/>
 
-### Step 2: Specify CMake source and buildsystem files
+### Step 2: Specify CMake source and buildsystem files using the MINGW compiler
 ```
-cmake -B ./build
+cmake -B ./build -G "MinGW Makefiles"
 ```
 
 This will create your project's "build" directory within the current one, along with the necessary CMake buildsystem files.
@@ -28,7 +28,7 @@ This will create your project's "build" directory within the current one, along 
 <br/>
 ### Step 3: Create the CMake build files
 ```
-cmake --build ./build -G "MinGW Makefiles"
+cmake --build ./build
 ```
 This will create the build files using the MinGW compiler you've put into your System PATH.
 <br/>
