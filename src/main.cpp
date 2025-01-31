@@ -57,7 +57,7 @@ void init(GLFWwindow* window) {
     imguiManager = new ImguiManager(*window, *timeManager);
     inputManager = new InputManager(*window, *timeManager);
     camera = new Camera(*timeManager, *inputManager);
-    modelTexture = new Texture("../../resources/textures/PlaceholderTexture.png");
+    modelTexture = new Texture("./resources/textures/PlaceholderTexture.png");
 
     camera->SetPos(cameraStartPos);
     glfwGetFramebufferSize(window, &width, &height);
@@ -103,8 +103,8 @@ void initShaders()
     vertexShader = new Shader(*shaderManager);
     fragmentShader = new Shader(*shaderManager);
 
-    vertexShader->CreateShader("../../resources/shaders/vertexShader.glsl", Shader::ShaderType::Vertex);
-    fragmentShader->CreateShader("../../resources/shaders/fragmentShader.glsl", Shader::ShaderType::Fragment);
+    vertexShader->CreateShader("./resources/shaders/vertexShader.glsl", Shader::ShaderType::Vertex);
+    fragmentShader->CreateShader("./resources/shaders/fragmentShader.glsl", Shader::ShaderType::Fragment);
 
     shaderManager->AddShader(vertexShader);
     shaderManager->AddShader(fragmentShader);
