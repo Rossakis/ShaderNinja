@@ -6,9 +6,7 @@ ShaderManager::ShaderManager(){
     Utils::printShaderLog(m_programID);
 
     if(m_programID <= 0){
-        std::cout << "Couldn't create a program Id" << std::endl;
-        glfwTerminate();
-        exit(EXIT_SUCCESS);
+        throw std::runtime_error("Couldn't create a program Id");
     }
 }
 
@@ -30,7 +28,6 @@ void ShaderManager::UseShaders(){
 void ShaderManager::AddShader(Shader* shader){
     if(shader == nullptr){
         throw std::runtime_error("Shader is null!");
-        return;
     }
     m_shaders.push_back(shader);
 }
@@ -43,7 +40,6 @@ void ShaderManager::PrintAttachedShaders()
 {
     if(m_shaders.size() <= 0)    {
         throw std::runtime_error("No shaders were added to ShaderManager!");
-        return;
     }
 
     GLint count;

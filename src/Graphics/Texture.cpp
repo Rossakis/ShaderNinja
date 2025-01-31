@@ -27,3 +27,4 @@ void Texture::LoadTexture(const char* textureImagePath){
         exit(EXIT_SUCCESS);
     }
 };
+

@@ -36,7 +36,8 @@ add_executable("${CMAKE_PROJECT_NAME}"
         src/Debug/ImguiManager.cpp
         src/Debug/ImguiManager.h
         src/Graphics/OBJModelImporter.cpp
-        src/Graphics/OBJModelImporter.h)
+        src/Graphics/OBJModelImporter.h
+        src/Graphics/Material.h)
 
 target_compile_definitions("${CMAKE_PROJECT_NAME}" PUBLIC 
     GLFW_INCLUDE_NONE=1 
@@ -74,14 +75,14 @@ add_custom_target(run
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 add_dependencies(run "${CMAKE_PROJECT_NAME}")
-
-# Define the source and destination for the resources folder
-set(SOURCE_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-set(DEST_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
-
-# Copy the resources folder to the release directory after build
-add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${SOURCE_RESOURCES_DIR}"  # Source resources directory
-        "${DEST_RESOURCES_DIR}"    # Destination release/resources
-)
+#
+## Define the source and destination for the resources folder
+#set(SOURCE_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+#set(DEST_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
+#
+## Copy the resources folder to the release directory after build
+#add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
+#        COMMAND ${CMAKE_COMMAND} -E copy_directory
+#        "${SOURCE_RESOURCES_DIR}"  # Source resources directory
+#        "${DEST_RESOURCES_DIR}"    # Destination release/resources
+#)

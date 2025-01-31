@@ -1,59 +1,45 @@
-#version 430 core
+#version 430
 
 layout (location = 0) in vec3 position; // Vertex position
 layout (location = 1) in vec2 texCoord; // Vertex texture coordinates
 layout (location = 2) in vec3 normal;   // Vertex normal (if needed for lighting calculations)
+layout (binding = 0) uniform sampler2D samp; // Texture sampler (not used in vertex shader)
 
-//layout (binding = 0) uniform sampler2D samp; // Texture sampler (not used in vertex shader)
-
+out vec3 varyingNormal; //Eye-space vertex normal
+out vec3 varyingLightDir; // Vector pointing at light source
+out vec3 varyingVertPos; // Vertex pos in eye-space
 out vec2 tc; // Texture coordinate passed to the fragment shader
 
-uniform mat4 projMat; // Projection matrix
-uniform mat4 mvMat;   // Model-view matrix
+struct PositionalLight
+{
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    vec3 position;
+};
 
-mat4 buildRotateX(float rad);
-mat4 buildRotateY(float rad);
-mat4 buildRotateZ(float rad);
-mat4 buildTranslate(float x, float y, float z);
+struct Material
+{
+    vec4 ambient;
+    vec4 diffuse;
+    vec4 specular;
+    float shininess;
+};
+
+uniform vec4 globalAmbient;
+uniform PositionalLight light;
+uniform Material material;
+uniform mat4 projMatrix;
+uniform mat4 mvMatrix;
+uniform mat4 normMatrix;
 
 void main(void) {
-    gl_Position = projMat * mvMat * vec4(position, 1.0); // Calculate final vertex position
+    varyingVertPos = (mvMatrix * vec4(position, 1.0)).xyz;
+    varyingLightDir = light.position - varyingVertPos;
+    varyingNormal = (normMatrix * vec4(normal, 1.0)).xyz;
     tc = texCoord; // Pass texture coordinates to the fragment shader
+
+    gl_Position = projMatrix * mvMatrix * vec4(position, 1.0); // Calculate final vertex position
 }
 
 
-// builds and returns a matrix that performs a rotation around the X axis
-mat4 buildRotateX(float rad) {
-    mat4 xrot = mat4(1.0, 0.0,      0.0,       0.0,
-                     0.0, cos(rad), -sin(rad), 0.0,
-                     0.0, sin(rad), cos(rad),  0.0,
-                     0.0, 0.0,      0.0,       1.0);
-    return xrot;
-}
-
-// builds and returns a matrix that performs a rotation around the Y axis
-mat4 buildRotateY(float rad) {
-    mat4 yrot = mat4(cos(rad),  0.0, sin(rad), 0.0,
-                     0.0,       1.0, 0.0,      0.0,
-                     -sin(rad), 0.0, cos(rad), 0.0,
-                     0.0,       0.0, 0.0,      1.0);
-    return yrot;
-}
-
-// builds and returns a matrix that performs a rotation around the Z axis
-mat4 buildRotateZ(float rad) {
-    mat4 zrot = mat4(cos(rad), -sin(rad), 0.0, 0.0,
-                     sin(rad), cos(rad),  0.0, 0.0,
-                     0.0,      0.0,       1.0, 0.0,
-                     0.0,      0.0,       0.0, 1.0);
-    return zrot;
-}
-
-// builds and returns a translation matrix
-mat4 buildTranslate(float x, float y, float z) {
-    mat4 trans = mat4(1.0, 0.0, 0.0, 0.0,
-                      0.0, 1.0, 0.0, 0.0,
-                      0.0, 0.0, 1.0, 0.0,
-                      x,   y,   z,   1.0);
-    return trans;
-}
