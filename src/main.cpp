@@ -219,14 +219,12 @@ void imguiEditModeLabel() {
     ImGui::End();
 }
 
-float lightsMenuHeight;
 void imguiLightsWidget() {
     ImGui::SetNextWindowPos(ImVec2(width - 360.0f, 50.0f), ImGuiCond_Always);
     ImGui::SetNextWindowSizeConstraints(ImVec2(400, 0), ImVec2(400, FLT_MAX));
-    lightsMenuHeight = ImGui::GetWindowHeight();
-    ImGui::CloseCurrentPopup();
 
     ImGui::Begin("Lights Menu");
+    ImGui::CloseCurrentPopup();
 
     ImGui::Text("Global Ambient Light");
     if (ImGui::SliderFloat("R##Global", &globalAmbient[0], 0, 1.0f, "%.2f")
@@ -268,8 +266,11 @@ void imguiLightsWidget() {
 }
 
 void imguiMaterialsWidget() {
-    ImGui::CloseCurrentPopup();
+    ImGui::SetNextWindowPos(ImVec2(width - 360.0f, 120), ImGuiCond_Always);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(400, 0), ImVec2(400, FLT_MAX));
+
     ImGui::Begin("Materials Menu");
+    ImGui::CloseCurrentPopup();
 
     ImGui::Text("Material Ambient");
     if (ImGui::SliderFloat("R##Global", &matAmbient[0], 0, 1.0f, "%.2f")
