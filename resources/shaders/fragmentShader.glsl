@@ -3,6 +3,7 @@
 in vec3 varyingNormal;
 in vec3 varyingLightDir;
 in vec3 varyingVertPos;
+in vec3 varyingHalfVector;
 in vec2 tc;       // Interpolated texture coordinates from the vertex shader
 out vec4 color;   // Output color of the fragment
 
@@ -34,15 +35,15 @@ void main(void){
     vec3 L = normalize(varyingLightDir);//light
     vec3 N = normalize(varyingNormal);// normal
     vec3 V = normalize(-varyingVertPos); //view
+    vec3 H = normalize(varyingHalfVector);
 
-    vec3 R = normalize(reflect(-L, N)); //Compute light reflection vector with respect to N
     float cosTheta = dot(L, N); // Get the angle between the light and surface normal
-    float cosFi = dot(V, R); // Angle between the view vector and the reflected light
+    float cosFi = dot(H, N);// get angle between normal and the halfway vector
 
     // Computer ADS (Ambient, Diffuse, Specular) contributions per pixel, and combine to output color
     vec3 ambient = ((globalAmbient * material.ambient) + (light.ambient * material.ambient)).xyz;
     vec3 diffuse = light.diffuse.xyz * material.diffuse.xyz * max(cosTheta, 0.0);
-    vec3 specular = light.specular.xyz * material.specular.xyz * pow(max(cosFi, 0.0), material.shininess);
+    vec3 specular = light.specular.xyz * material.specular.xyz * pow(max(cosFi, 0.0), material.shininess * 3.0); // the *3.0 improves the specular highlight
 
     vec4 textureColor = texture(samp, tc);  // Get the texture's color
     vec3 finalColor = (ambient + diffuse + specular) * textureColor.rgb;

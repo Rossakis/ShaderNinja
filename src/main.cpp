@@ -18,6 +18,7 @@ void initShaders();
 void imguiOptionsWidget();
 void imguiEditModeLabel();
 void imguiLightsWidget();
+void imguiMaterialsWidget();
 void imguiShowMessage(float time, const char* message);
 void setupObjVertices(std::string modelPath);
 void initLights();
@@ -95,6 +96,7 @@ void init(GLFWwindow* window) {
     glDepthFunc(GL_LEQUAL);
 
     initShaders();
+    initLights();
 }
 
 void initShaders()
@@ -121,8 +123,8 @@ void display(GLFWwindow* window, double currentTime) {
     imguiOptionsWidget();
     imguiEditModeLabel();
     imguiLightsWidget();
+    imguiMaterialsWidget();
     applyMatrices(window, (float)currentTime);
-    initLights();
 
     glDrawArrays(GL_TRIANGLES, 0, numVertices);
 
@@ -212,21 +214,102 @@ void imguiEditModeLabel() {
                  ImGuiWindowFlags_NoInputs);
 
     // Set text color
-    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Mode: %s", isInPauseMode ? "PauseMode" : "FreeMovementMode");
+    ImGui::TextColored(ImVec4(1.0f, 1.0f, 0.0f, 1.0f), "Mode: %s", isInPauseMode ? "PauseMode \n Press F1 to change to FreeMovementMode" : "FreeMovementMode \n Press F1 to change to PauseMode");
 
     ImGui::End();
 }
 
+float lightsMenuHeight;
 void imguiLightsWidget() {
-    ImGui::Begin("Lights");
+    ImGui::SetNextWindowPos(ImVec2(width - 360.0f, 50.0f), ImGuiCond_Always);
+    ImGui::SetNextWindowSizeConstraints(ImVec2(400, 0), ImVec2(400, FLT_MAX));
+    lightsMenuHeight = ImGui::GetWindowHeight();
+    ImGui::CloseCurrentPopup();
 
-    // Sliders for modifying the values of tempVar
-    ImGui::SliderFloat("X", &lightPosV.x, startLightPos.x -1000.0f, startLightPos.x + 1000.0f, "%.2f");
-    ImGui::SliderFloat("Y", &lightPosV.y, startLightPos.y -1000.0f, startLightPos.y + 1000.0f, "%.2f");
-    ImGui::SliderFloat("Z", &lightPosV.z, startLightPos.z -1000.0f, startLightPos.z + 1000.0f, "%.2f");
+    ImGui::Begin("Lights Menu");
+
+    ImGui::Text("Global Ambient Light");
+    if (ImGui::SliderFloat("R##Global", &globalAmbient[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Global", &globalAmbient[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Global", &globalAmbient[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Global", &globalAmbient[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
+
+    ImGui::Text("Ambient Light");
+    if (ImGui::SliderFloat("R##Ambient", &lightAmbient[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Ambient", &lightAmbient[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Ambient", &lightAmbient[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Ambient", &lightAmbient[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
+
+    ImGui::Text("Diffuse Light");
+    if (ImGui::SliderFloat("R##Diffuse", &lightDiffuse[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Diffuse", &lightDiffuse[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Diffuse", &lightDiffuse[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Diffuse", &lightDiffuse[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
+
+    ImGui::Text("Specular Light");
+    if (ImGui::SliderFloat("R##Specular", &lightSpecular[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Specular", &lightSpecular[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Specular", &lightSpecular[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Specular", &lightSpecular[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
 
     ImGui::End();
 }
+
+void imguiMaterialsWidget() {
+    ImGui::CloseCurrentPopup();
+    ImGui::Begin("Materials Menu");
+
+    ImGui::Text("Material Ambient");
+    if (ImGui::SliderFloat("R##Global", &matAmbient[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Global", &matAmbient[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Global", &matAmbient[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Global", &matAmbient[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
+
+    ImGui::Text("Material Diffuse");
+    if (ImGui::SliderFloat("R##Ambient", &matDiffuse[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Ambient", &matDiffuse[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Ambient", &matDiffuse[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Ambient", &matDiffuse[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
+
+    ImGui::Text("Material Specular");
+    if (ImGui::SliderFloat("R##Diffuse", &matSpecular[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Diffuse", &matSpecular[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Diffuse", &matSpecular[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Diffuse", &matSpecular[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
+
+    ImGui::Text("Material Shininess");
+    if (ImGui::SliderFloat("R##Specular", &matShininess[0], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("G##Specular", &matShininess[1], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("B##Specular", &matShininess[2], 0, 1.0f, "%.2f")
+        || ImGui::SliderFloat("A##Specular", &matShininess[3], 0, 1.0f, "%.2f")) {
+        initLights();
+        }
+    ImGui::Spacing();
+
+    ImGui::End();
+}
+
 
 
 void applyMatrices(GLFWwindow* window, float currentTime){
@@ -242,9 +325,6 @@ void applyMatrices(GLFWwindow* window, float currentTime){
         mMatrix = glm::rotate(mMatrix, camera->GetRot().x, glm::vec3(0.0f, 1.0f, 0.0f));
         mMatrix = glm::rotate(mMatrix, -camera->GetRot().y, glm::vec3(1.0f, 0.0f, 0.0f));
     }
-
-    //currentLightPos = glm::vec3(startLightPos.x, startLightPos.y, startLightPos.z);
-    //initLights();
 
     mvMatrix = vMatrix * mMatrix;
     normMatrix = glm::transpose(glm::inverse(mvMatrix));

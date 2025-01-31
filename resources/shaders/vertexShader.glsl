@@ -8,6 +8,7 @@ layout (binding = 0) uniform sampler2D samp; // Texture sampler (not used in ver
 out vec3 varyingNormal; //Eye-space vertex normal
 out vec3 varyingLightDir; // Vector pointing at light source
 out vec3 varyingVertPos; // Vertex pos in eye-space
+out vec3 varyingHalfVector; // Used for Blinn-Phong calculations
 out vec2 tc; // Texture coordinate passed to the fragment shader
 
 struct PositionalLight
@@ -37,8 +38,9 @@ void main(void) {
     varyingVertPos = (mvMatrix * vec4(position, 1.0)).xyz;
     varyingLightDir = light.position - varyingVertPos;
     varyingNormal = (normMatrix * vec4(normal, 1.0)).xyz;
-    tc = texCoord; // Pass texture coordinates to the fragment shader
+    varyingHalfVector = (varyingLightDir + (-varyingVertPos)).xyz;
 
+    tc = texCoord; // Pass texture coordinates to the fragment shader
     gl_Position = projMatrix * mvMatrix * vec4(position, 1.0); // Calculate final vertex position
 }
 
