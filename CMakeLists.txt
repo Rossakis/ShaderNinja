@@ -80,7 +80,7 @@ add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
 )
 
 # Copy MinGW DLLs after building
-set(DLL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries") # Change to your MinGW path
+set(DLL_DIR "${SOURCE_RESOURCES_DIR}/libraries") # Change to your MinGW path
 set(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}") # Where the executable is
 
 add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
