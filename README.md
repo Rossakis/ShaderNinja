@@ -6,7 +6,6 @@ https://cmake.org/download/
 
 In case you're using "<b>Visual Studio Code</b>", make sure to download the "<b>C/C++</b>" and "<b>CMake Tools</b>" extensions by Microsoft.
 <br/>
-<br/>
 
 ### Step 1: Navigate to the directory through your terminal
 ```
@@ -24,7 +23,6 @@ cmake -B ./build -G "MinGW Makefiles"
 ```
 
 This will create your project's "build" directory within the current one, along with the necessary CMake buildsystem files.
-<br/>
 <br/>
 ### Step 3: Create the CMake build files
 ```
