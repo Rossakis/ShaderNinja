@@ -30,7 +30,7 @@ This will create your project's "build" directory within the current one, along 
 ```
 cmake --build ./build --target run
 ```
-This will build and run the `ShaderNinja.exe` in the .\build directory. You can also navigate to the same directory in File Explorer and double-click on the created executable to run it.
+This will build and run the `ShaderNinja.exe` in the `ShaderNinja/build` directory. You can also navigate to the same directory in File Explorer and double-click on the created executable to run it.
 
 
 ![ShaderNinja-Instancing-100K-Cubes](https://github.com/user-attachments/assets/4a294322-d9c3-41e1-a347-99a3c70519d5)
