@@ -1,161 +1,299 @@
 # Shader Ninja - Documentation
 
-This document provides an overview of the classes used in the project. Each section describes a class and its potential responsibilities.
+# Project Documentation
 
-## Classes
+This document provides an overview of the classes and their functionalities in the project. Each section describes a class and its potential responsibilities.
 
-### Utils
-- **Description**: 
-  - Handles utility functions and common operations.
-- **Responsibilities**:
-  - Error checking and logging.
-  - Helper functions for common tasks.
+---
 
-### ScreenUtils
-- **Description**: 
-  - Manages screen and window-related operations.
-- **Responsibilities**:
-  - Setting up the screen mode (fullscreen/windowed).
-  - Managing window properties.
+## Contents
+0. [Building and Linking](../README.md)
+1. [High-Level Interface](#high-level-interface)
+   1. [BufferManager](#buffermanager)
+   2. [InputManager](#inputmanager)
+   3. [TimeManager](#timemanager)
+   4. [ImguiManager](#imguimanager)
+   5. [Material](#material)
+   6. [Mesh](#mesh)
+   7. [OBJModelImporter](#objmodelimporter)
+   8. [Primitive](#primitive)
+   9. [Shader](#shader)
+   10. [ShaderManager](#shadermanager)
+   11. [Texture](#texture)
+   12. [Camera](#camera)
+   13. [ScreenUtils](#screenutils)
+   14. [Utils](#utils)
+2. [System](#system)
+3. [Graphics](#graphics)
+4. [Input](#input)
+5. [Time Management](#time-management)
+6. [GUI](#gui)
 
-### InputManager
-- **Description**: 
-  - Handles user input from various devices.
-- **Responsibilities**:
-  - Processing keyboard, mouse, and joystick input.
-  - Managing input states and events.
+---
 
-### Texture
-- **Description**: 
-  - Manages texture loading and binding.
-- **Responsibilities**:
-  - Loading textures from files.
-  - Binding textures to OpenGL contexts.
+## Building and Linking
+This section will describe how to build and link the project, including dependencies and setup instructions.
 
-### Primitive
-- **Description**: 
-  - Handles the creation and management of primitive shapes.
-- **Responsibilities**:
-  - Creating basic geometric shapes (e.g., cubes, spheres).
-  - Managing vertex data for primitives.
+---
 
-### Camera
-- **Description**: 
-  - Manages the camera and its properties.
-- **Responsibilities**:
-  - Handling camera movement and rotation.
-  - Managing view and projection matrices.
+## High-Level Interface
+The high-level interface consists of classes that manage core functionalities such as buffer management, input handling, time management, GUI integration, and more.
 
 ### BufferManager
-- **Description**: 
-  - Manages OpenGL buffers.
-- **Responsibilities**:
-  - Creating and managing vertex buffer objects (VBOs).
-  - Managing vertex array objects (VAOs).
+[[Header]](../src/Core/BufferManager.h) [[Cpp]](../src/Core/BufferManager.cpp)
+Manages OpenGL buffer objects, including vertex arrays (VAOs) and vertex buffer objects (VBOs).
 
-### Shader
-- **Description**: 
-  - Manages shader programs.
 - **Responsibilities**:
-  - Loading and compiling shaders.
-  - Linking shader programs.
+  - Binding and updating vertex buffers.
+  - Managing VAOs and VBOs.
+  - Providing access to buffer objects for rendering.
 
-### ShaderManager
-- **Description**: 
-  - Manages multiple shader programs.
-- **Responsibilities**:
-  - Adding and linking shaders.
-  - Managing the active shader program.
+- **Functions**:
+  - `BindVertexArray()`: Binds the vertex array object.
+  - `BindVertexBuffer()`: Binds vertex data to a buffer.
+  - `UpdateVertexBuffer()`: Updates vertex buffer data.
+  - `GetVAO()`: Returns the vertex array object.
+  - `GetNumOfVBOs()`: Returns the number of vertex buffer objects.
+  - `GetVBOs()`: Returns a list of vertex buffer objects.
 
-### ImguiManager
-- **Description**: 
-  - Manages ImGui integration.
-- **Responsibilities**:
-  - Handling ImGui rendering and updates.
-  - Managing ImGui windows and widgets.
+---
 
-### OBJModelImporter
-- **Description**: 
-  - Handles the import of OBJ model files.
-- **Responsibilities**:
-  - Parsing OBJ files.
-  - Extracting vertex, texture, and normal data.
+### InputManager
+[[Header]](../src/Core/InputManager.h) [[Cpp]](../src/Core/InputManager.cpp)
+Handles user input from keyboard and mouse.
 
-### Material
-- **Description**: 
-  - Manages material properties.
 - **Responsibilities**:
-  - Setting material properties (ambient, diffuse, specular, shininess).
-  - Managing default material values.
+  - Tracking mouse and keyboard input.
+  - Calculating mouse delta for camera movement.
+  - Detecting key presses for movement and actions.
+
+- **Functions**:
+  - `UpdateInput()`: Updates input states.
+  - `GetMouseDeltaRaw()`: Returns unscaled mouse delta.
+  - `GetMouseDelta()`: Returns mouse delta scaled by frame time.
+  - `UpPressed()`, `DownPressed()`, etc.: Detects specific key presses.
+
+---
 
 ### TimeManager
-- **Description**: 
-  - Manages time-related operations.
+[[Header]](../src/Core/TimeManager.h) [[Cpp]](../src/Core/TimeManager.cpp)
+Manages time-related operations, such as delta time calculation.
+
 - **Responsibilities**:
-  - Tracking frame time and delta time.
-  - Managing time-based updates.
+  - Tracking frame time.
+  - Calculating delta time for smooth animations and updates.
 
-## Functions
+- **Functions**:
+  - `UpdateTime()`: Updates the time state.
+  - `GetDeltaTime()`: Returns the time elapsed since the last frame.
 
-### applyMatrices
-- **Description**: 
-  - Applies transformation matrices to the shader.
+---
+
+### ImguiManager
+[[Header]](../src/Debug/ImguiManager.h) [[Cpp]](../src/Debug/ImguiManager.cpp)
+Manages ImGui integration for GUI rendering and file dialogs.
+
 - **Responsibilities**:
-  - Calculating and setting model-view, projection, and normal matrices.
+  - Initializing and managing ImGui.
+  - Handling file dialogs for OBJ and texture loading.
+  - Displaying temporary messages.
 
-### initShaders
-- **Description**: 
-  - Initializes shaders.
+- **Functions**:
+  - `UpdateFrame()`: Updates ImGui frame state.
+  - `UpdateFileDialog()`: Updates file dialog states.
+  - `Render()`: Renders ImGui elements.
+  - `Exit()`: Cleans up ImGui resources.
+  - `printMessage()`: Displays a temporary message.
+  - `OpenFileDialog()`: Opens a file dialog for a specific file type.
+  - `GetFileDialog()`: Returns the file dialog for a specific file type.
+
+---
+
+### Material
+[[Header]](../src/Graphics/Material.h) [[Cpp]](../src/Graphics/Material.cpp)
+Manages material properties for rendering.
+
 - **Responsibilities**:
-  - Creating and linking shader programs.
+  - Providing default material properties (ambient, diffuse, specular, shininess).
 
-### imguiOptionsWidget
-- **Description**: 
-  - Displays ImGui options widget.
+- **Functions**:
+  - `GetDefaultAmbient()`: Returns default ambient material properties.
+  - `GetDefaultDiffuse()`: Returns default diffuse material properties.
+  - `GetDefaultSpecular()`: Returns default specular material properties.
+  - `GetDefaultShininess()`: Returns default shininess material properties.
+
+---
+
+### Mesh
+[[Header]](../src/Graphics/Mesh.h) [[Cpp]](../src/Graphics/Material.cpp)
+Represents a 3D mesh with vertices and textures.
+
 - **Responsibilities**:
-  - Managing UI elements for options.
+  - Managing vertex data and textures for rendering.
+  - Loading textures for the mesh.
 
-### imguiEditModeLabel
-- **Description**: 
-  - Displays the current edit mode.
+- **Functions**:
+  - `LoadTexture()`: Loads a texture for the mesh.
+  - `GetVertices()`: Returns the vertices of the mesh.
+  - `GetVerticesSize()`: Returns the size of the vertex data.
+
+---
+
+### OBJModelImporter
+[[Header]](../src/Graphics/OBJModelImporter.h) [[Cpp]](../src/Graphics/OBJModelImporter.cpp)
+Imports and parses OBJ model files.
+
 - **Responsibilities**:
-  - Showing the current mode (PauseMode/FreeMovementMode).
+  - Parsing OBJ files to extract vertex, texture, and normal data.
+  - Providing access to parsed model data.
 
-### imguiLightsWidget
-- **Description**: 
-  - Displays ImGui lights widget.
+- **Functions**:
+  - `parseObjFile()`: Parses an OBJ file.
+  - `getNumVertices()`: Returns the number of vertices in the model.
+  - `getVertices()`: Returns the vertex data.
+  - `getTexCoords()`: Returns the texture coordinates.
+  - `getNormals()`: Returns the normal data.
+
+---
+
+### Primitive
+[[Header]](../src/Graphics/Primitive.h) [[Cpp]](../src/Graphics/Primitive.cpp)
+Provides predefined primitive shapes (e.g., cube, pyramid).
+
 - **Responsibilities**:
-  - Managing UI elements for light properties.
+  - Storing vertex data for primitive shapes.
+  - Creating and managing primitive shapes.
 
-### imguiMaterialsWidget
-- **Description**: 
-  - Displays ImGui materials widget.
+- **Functions**:
+  - `CreatePrimitiveCube()`: Creates a cube primitive.
+
+---
+
+### Shader
+[[Header]](../src/Graphics/Shader.h) [[Cpp]](../src/Graphics/Shader.cpp)
+Manages individual shaders (vertex, fragment).
+
 - **Responsibilities**:
-  - Managing UI elements for material properties.
+  - Compiling and managing shader programs.
 
-### imguiShowMessage
-- **Description**: 
-  - Displays a temporary message in ImGui.
+- **Functions**:
+  - `CreateShader()`: Creates a shader from a file.
+  - `GetId()`: Returns the shader ID.
+
+---
+
+### ShaderManager
+[[Header]](../src/Graphics/ShaderManager.h) [[Cpp]](../src/Graphics/ShaderManager.h)
+Manages multiple shaders and links them into a shader program.
+
 - **Responsibilities**:
-  - Showing success/error messages.
+  - Linking shaders into a program.
+  - Managing the shader program.
 
-### setupObjVertices
-- **Description**: 
-  - Sets up vertices for an OBJ model.
+- **Functions**:
+  - `LinkShaders()`: Links shaders into a program.
+  - `UseShaders()`: Activates the shader program.
+  - `AddShader()`: Adds a shader to the manager.
+  - `GetProgramId()`: Returns the shader program ID.
+
+---
+
+### Texture
+[[Header]](../src/Graphics/Texture.h) [[Cpp]](../src/Graphics/Texture.cpp)
+Manages texture loading and binding.
+
 - **Responsibilities**:
-  - Binding vertex data to OpenGL buffers.
+  - Loading textures from files.
+  - Binding textures for rendering.
 
-### initLights
-- **Description**: 
-  - Initializes light properties.
+- **Functions**:
+  - `LoadTexture()`: Loads a texture from a file.
+  - `GetTextureId()`: Returns the texture ID.
+
+---
+
+### Camera
+[[Header]](../src/Scene/Camera.h) [[Cpp]](../src/Scene/Camera.cpp)
+Manages the camera's position and rotation.
+
 - **Responsibilities**:
-  - Setting light properties in the shader.
+  - Updating camera position and rotation based on input.
+  - Providing camera state for rendering.
 
-## Main Function
+- **Functions**:
+  - `Update()`: Updates the camera state.
+  - `GetPos()`: Returns the camera position.
+  - `SetPos()`: Sets the camera position.
+  - `GetRot()`: Returns the camera rotation.
 
-### main
-- **Description**: 
-  - Entry point of the application.
+---
+
+### ScreenUtils
+[[Header]](../src/Utilities/ScreenUtils.h)
+Provides utility functions for screen resolution and window management.
+
 - **Responsibilities**:
-  - Initializing GLFW and OpenGL context.
-  - Setting up the main loop and handling window events.
+  - Setting screen resolution.
+  - Managing fullscreen and windowed modes.
+
+- **Functions**:
+  - `setResolutionHD()`: Sets the resolution to HD.
+  - `setResolutionFHD()`: Sets the resolution to Full HD.
+  - `setScreenMode()`: Sets the screen mode (fullscreen or windowed).
+
+---
+
+### Utils
+[[Header]](../src/Utilities/Utils.h) [[Cpp]](../src/Utilities/Utils.cpp)
+Provides utility functions for shader loading, debugging, and matrix/vector operations.
+
+- **Responsibilities**:
+  - Reading shader files.
+  - Debugging OpenGL and shader programs.
+  - Printing matrix and vector values.
+
+- **Functions**:
+  - `readShaderFile()`: Reads a shader file.
+  - `createShaderProgram()`: Creates a shader program.
+  - `printShaderLog()`: Prints shader log for debugging.
+  - `printProgramLog()`: Prints program log for debugging.
+  - `checkOpenGLError()`: Checks for OpenGL errors.
+  - `printMatrix4Value()`: Prints a 4x4 matrix.
+  - `printVector3Value()`: Prints a 3D vector.
+
+---
+
+## System
+This section describes the core systems used in the project.
+
+---
+
+## Graphics
+This section covers graphics-related functionalities.
+
+---
+
+### Buffer Management
+
+---
+
+## Input
+This section covers input handling functionalities.
+
+
+---
+
+## Time Management
+This section covers time-related functionalities.
+
+
+---
+
+## GUI
+This section covers GUI-related functionalities.
+
+
+---
+
+## [Building and Linking](../README.md)
+
