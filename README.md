@@ -3,6 +3,10 @@
 Shader Ninja is 3D viewing program, running on OpenGL 4.3, that handles loading of Wavefront (OBJ) type models, alongside textures for them through PNG and JPG files. The Scene contains Imgui parameters for managing lighting values, as well as the material values applied to the 3D model.
 
 
+https://github.com/user-attachments/assets/6640cc3b-2e61-49a7-a422-9710d57e5766
+
+
+
 #### BUILDING SHADER-NINJA
 
 NOTE: Make sure you have at least C++ 20, Mingw compiler version 11.0 and newer (necessary), and have installed CMake on your device beforehand at: https://cmake.org/download/
