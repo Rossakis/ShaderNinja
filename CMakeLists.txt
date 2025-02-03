@@ -68,6 +68,27 @@ target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
 # set(GLM_BUILD_LIBRARY ON CACHE BOOL "Build GLM as a static or shared library" FORCE)#we want to build glm as a static libray, not header file
 target_link_libraries("${CMAKE_PROJECT_NAME}" PRIVATE glfw glad imgui glm::glm-header-only soil2)
 
+# Define the source and destination for the resources folder
+set(SOURCE_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
+set(DEST_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
+
+# Copy the resources folder to the release directory after build
+add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+    "${SOURCE_RESOURCES_DIR}"  # Source resources directory
+    "${DEST_RESOURCES_DIR}"    # Destination release/resources
+)
+
+# Copy MinGW DLLs after building
+set(DLL_DIR "${CMAKE_CURRENT_SOURCE_DIR}/libraries") # Change to your MinGW path
+set(OUTPUT_DIR "${CMAKE_CURRENT_BINARY_DIR}") # Where the executable is
+
+add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
+    COMMAND ${CMAKE_COMMAND} -E copy_directory
+        "${DLL_DIR}"
+        "${OUTPUT_DIR}"
+)
+
 # Add a custom target to build and run the project
 add_custom_target(run
     COMMAND $<TARGET_FILE:${CMAKE_PROJECT_NAME}>
@@ -75,14 +96,3 @@ add_custom_target(run
     WORKING_DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}
 )
 add_dependencies(run "${CMAKE_PROJECT_NAME}")
-
-# Define the source and destination for the resources folder
-set(SOURCE_RESOURCES_DIR "${CMAKE_CURRENT_SOURCE_DIR}/resources")
-set(DEST_RESOURCES_DIR "${CMAKE_CURRENT_BINARY_DIR}/resources")
-
-# Copy the resources folder to the release directory after build
-add_custom_command(TARGET "${CMAKE_PROJECT_NAME}" POST_BUILD
-        COMMAND ${CMAKE_COMMAND} -E copy_directory
-        "${SOURCE_RESOURCES_DIR}"  # Source resources directory
-        "${DEST_RESOURCES_DIR}"    # Destination release/resources
-)
