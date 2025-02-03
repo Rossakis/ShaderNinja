@@ -28,27 +28,10 @@ This will create your project's "build" directory within the current one, along 
 <br/>
 ### Step 3: Create the CMake build files
 ```
-cmake --build ./build
+cmake --build ./build --target run
 ```
-This will create the build files using the MinGW compiler you've put into your System PATH.
-<br/>
-<br/>
-### Step 4: The executable will now have been created in the "build" directory. Now, you can either:
-  a) Type this to run the program:
-  ```
-  ./build/your_executable_name
-  ```
- OR 
-  <br/>
-  <br/>
-  b) Navigate to the same folder in Explorer (Windows) or Finder (MacOS), and double-click on the created executable.
+This will build and run the `ShaderNinja.exe` in the .\build directory. You can also navigate to the same directory in File Explorer and double-click on the created executable to run it.
 
-### Alternative to Step 3-4: To both build and run the executable in the "build" directory with one command, you can type:
-  ```
-  cmake --build ./build --target run
-  ```
-  <br/>
-  <br/>
 
 ![ShaderNinja-Instancing-100K-Cubes](https://github.com/user-attachments/assets/4a294322-d9c3-41e1-a347-99a3c70519d5)
 
