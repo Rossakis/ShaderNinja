@@ -55,7 +55,7 @@ endif()
 target_include_directories("${CMAKE_PROJECT_NAME}" PUBLIC
     "${CMAKE_CURRENT_SOURCE_DIR}/src"  
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Core"  
-    "${CMAKE_CURRENT_SOURCE_DIR}/src/Debug"
+    "${CMAKE_CURRENT_SOURCE_DIR}/src/GUI"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Graphics"
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Physics"  
     "${CMAKE_CURRENT_SOURCE_DIR}/src/Scene"  

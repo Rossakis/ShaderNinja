@@ -264,34 +264,48 @@ Provides utility functions for shader loading, debugging, and matrix/vector oper
 ---
 
 ## System
-This section describes the core systems used in the project.
+In order for the program to be able to register time and input, `TimeManager` and `InputManager` need to be instantiated with their respective constructors and their `Update()` function called in the `while()` loop of the main program.
+
+<u>**Note**</u> that you need to instantiate `TimeManager` **before** the `InputManager`, due to `InputManager`'s constructor needing a reference to it.
+
+Another useful class to use is the `Camera` class, which contains and movement data position, which can be used with `TimeManager` and `InputManager` in order to move around in the scene. Its `Update()` function should also be called in the `while()` loop of the main program.
 
 ---
 
 ## Graphics
-This section covers graphics-related functionalities.
+`OBJModelImporter` is the class used to load the **OBJ** type of format into the program. It retuns the necessary data, such as vertices count, to whoever calls it, and can be used either with manual OpenGL buffer loading (like in the main.cpp program), or with the `Mesh` class, to create a mesh instance.
+
+`Primitive` class can be used if you want to create simple 3D primitive shapes, like pyramids or cubes, if loading 3D objects doesn't seem like an option.
+
 
 ---
 
 ### Buffer Management
+Most of the buffer management in the main program is done manually, by calling the OpenGL buffer functions (e.g. `glGenBuffer()`).
+
+However, if you want to, you can use `BufferManager` as a helper class to able to load basic vertices, textures, normals, etc. But it is ***not*** needed if you don't want to use it.
 
 ---
 
 ## Input
-This section covers input handling functionalities.
+All of the program's user input (save for GUI) is done through the `InputManager` instance in the main program. 
+It retains data about the WASD keys for camera movement, and mouse rotations on the x and y axis.
 
 
 ---
 
 ## Time Management
-This section covers time-related functionalities.
-
+`TimeManager` contains the core time data to be used for other classes, such as current time delta time.
+It's used as a core component for many classes that need to be updated contantly (e.g. `InputManager`).
 
 ---
 
 ## GUI
-This section covers GUI-related functionalities.
+All of the GUI in Shader Ninja is done through `ImguiManager`. In it, other than the main `imgui.h` library, another library called `imfilebrowser.h` is used, to able to create dialogs/windows for file selection.
 
+The `ImguiManager->UpdateFrame()`  needs to be called before `TimeManager.UpdateTime()` and `InputManager.UpdateInput()`, to set the next frames it will show before OpenGL gets loaded (otherwise imgui gui will *not* be shown).
+
+<u>**However**</u>, the `ImguiManager->UpdateFileDialog()` and `ImguiManager->UpdateRender()` functions need to be called ***after*** `UpdateTime()` and `UpdateInput()`, to render the Imgui GUI and the FileDialog *over* the OpenGL window.
 
 ---
 
