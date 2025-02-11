@@ -309,5 +309,5 @@ The `ImguiManager->UpdateFrame()`  needs to be called before `TimeManager.Update
 
 ---
 
-## [Building and Linking](../README.md)
+## [Building and Linking](https://github.com/Rossakis/ShaderNinja/blob/main/README.md)
 
